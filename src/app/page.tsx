@@ -35,24 +35,108 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen text-white bg-[#06060e]">
+    <div
+      className="min-h-screen text-white"
+      style={{
+        background: '#06060e',
+        fontFamily: "'DM Sans', 'Inter', system-ui, sans-serif",
+      }}
+    >
+      {/* ── Global styles ── */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,900&family=DM+Serif+Display:ital@0;1&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .glass-card {
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.08);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+        }
+
+        .noise-bg::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+          pointer-events: none;
+          opacity: 0.4;
+        }
+
+        .gradient-text {
+          background: linear-gradient(135deg, #fff 30%, #a78bfa 65%, #60a5fa 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .hover-lift {
+          transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
+        }
+        .hover-lift:hover {
+          transform: translateY(-6px);
+        }
+
+        .glow-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: #a78bfa;
+          box-shadow: 0 0 12px 4px rgba(167, 139, 250, 0.5);
+          display: inline-block;
+        }
+      `}</style>
+
+      {/* ── Ambient background orbs ── */}
+      <div aria-hidden style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
+        <div style={{
+          position: 'absolute', top: '-10%', left: '-5%',
+          width: 600, height: 600,
+          background: 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 70%)',
+          filter: 'blur(40px)'
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '10%', right: '-10%',
+          width: 500, height: 500,
+          background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
+          filter: 'blur(40px)'
+        }} />
+        <div style={{
+          position: 'absolute', top: '50%', left: '40%',
+          width: 400, height: 400,
+          background: 'radial-gradient(circle, rgba(52,211,153,0.08) 0%, transparent 70%)',
+          filter: 'blur(60px)'
+        }} />
+      </div>
+
       {/* ── Hero ── */}
       <section
         ref={heroRef}
-        className="relative min-h-screen flex items-center overflow-hidden z-10"
+        className="noise-bg"
+        style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden', zIndex: 1 }}
       >
         {/* Subtle grid lines */}
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
+        <div aria-hidden style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+          pointerEvents: 'none'
+        }} />
 
         <motion.div
-          style={{ opacity: heroOpacity, y: heroY, width: '100%' }}
-          className="relative z-20"
+          style={{ opacity: heroOpacity, y: heroY, position: 'relative', zIndex: 2, width: '100%' }}
         >
-          <div className="max-w-[1200px] mx-auto px-10 py-[120px]">
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 40px 80px' }}>
             <motion.div variants={stagger} initial="initial" animate="animate">
               {/* Badge */}
-              <motion.div variants={fadeUp} className="mb-8">
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#a78bfa1f] border border-[#a78bfa4d] text-[13px] text-[#c4b5fd] tracking-wider">
+              <motion.div variants={fadeUp} style={{ marginBottom: 32 }}>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '6px 16px', borderRadius: 100,
+                  background: 'rgba(167,139,250,0.12)',
+                  border: '1px solid rgba(167,139,250,0.3)',
+                  fontSize: 13, color: '#c4b5fd', letterSpacing: '0.04em'
+                }}>
                   <span className="glow-dot" />
                   Next-Gen Printing Infrastructure
                 </span>
@@ -61,33 +145,63 @@ export default function HomePage() {
               {/* Headline */}
               <motion.h1
                 variants={fadeUp}
-                className="font-serif-display text-[clamp(52px,8vw,96px)] leading-none tracking-[-0.03em] mb-7 max-w-[820px]"
+                style={{
+                  fontFamily: "'DM Serif Display', serif",
+                  fontSize: 'clamp(52px, 8vw, 96px)',
+                  lineHeight: 1.0,
+                  letterSpacing: '-0.03em',
+                  marginBottom: 28,
+                  maxWidth: 820
+                }}
               >
                 <span className="gradient-text">Print the</span>
                 <br />
-                <span className="text-white/35 italic">Future.</span>
+                <span style={{ color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' }}>Future.</span>
               </motion.h1>
 
               {/* Subheadline */}
               <motion.p
                 variants={fadeUp}
-                className="text-[clamp(17px,2vw,21px)] text-white/50 max-w-[560px] leading-relaxed mb-12 font-light"
+                style={{
+                  fontSize: 'clamp(17px, 2vw, 21px)',
+                  color: 'rgba(255,255,255,0.5)',
+                  maxWidth: 560,
+                  lineHeight: 1.7,
+                  marginBottom: 48,
+                  fontWeight: 300
+                }}
               >
                 The most advanced cloud-printing network in Bangladesh. Secure, instantaneous, and truly decentralized.
               </motion.p>
 
               {/* CTA buttons */}
-              <motion.div variants={fadeUp} className="flex flex-wrap gap-4">
-                <Link 
-                  href="/explore" 
-                  className="inline-flex items-center gap-2.5 px-8 py-4 bg-white text-[#0a0a14] font-bold text-[15px] rounded-full transition-all hover:bg-[#a78bfa] hover:text-white"
+              <motion.div variants={fadeUp} style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                <Link href="/explore" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 10,
+                  padding: '14px 28px',
+                  background: 'white', color: '#0a0a14',
+                  fontWeight: 700, fontSize: 15, borderRadius: 100,
+                  border: 'none', cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                  textDecoration: 'none'
+                }}
+                  onMouseOver={e => { e.currentTarget.style.background = '#a78bfa'; e.currentTarget.style.color = 'white'; }}
+                  onMouseOut={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#0a0a14'; }}
                 >
                   <MapPin size={16} />
                   Find a Kiosk
                 </Link>
-                <Link 
-                  href="/about" 
-                  className="inline-flex items-center gap-2.5 px-8 py-4 bg-transparent text-white/70 font-medium text-[15px] rounded-full border border-white/15 transition-all hover:border-white/40 hover:text-white"
+                <Link href="/about" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 10,
+                  padding: '14px 28px',
+                  background: 'transparent', color: 'rgba(255,255,255,0.7)',
+                  fontWeight: 500, fontSize: 15, borderRadius: 100,
+                  border: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                  textDecoration: 'none'
+                }}
+                  onMouseOver={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; e.currentTarget.style.color = 'white'; }}
+                  onMouseOut={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
                 >
                   Learn More <ArrowRight size={16} />
                 </Link>
@@ -97,19 +211,23 @@ export default function HomePage() {
         </motion.div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
+        <div style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', zIndex: 2 }}>
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-            className="w-[1px] h-[60px] bg-gradient-to-b from-transparent to-[#a78bfa99] mx-auto"
+            style={{
+              width: 1, height: 60,
+              background: 'linear-gradient(to bottom, transparent, rgba(167,139,250,0.6))',
+              margin: '0 auto'
+            }}
           />
         </div>
       </section>
 
       {/* ── Stats bar ── */}
-      <section className="relative z-10 border-y border-white/5">
-        <div className="max-w-[1200px] mx-auto px-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4">
+      <section style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
             {[
               { value: "48K+", label: "Successful Prints" },
               { value: "99.9%", label: "System Uptime" },
@@ -122,12 +240,15 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 viewport={{ once: true }}
-                className={`py-9 px-8 ${i < 3 ? 'lg:border-r border-white/5' : ''} ${i % 2 === 0 ? 'border-r lg:border-r-0' : ''}`}
+                style={{
+                  padding: '36px 32px',
+                  borderRight: i < 3 ? '1px solid rgba(255,255,255,0.06)' : 'none'
+                }}
               >
-                <div className="text-[clamp(28px,3.5vw,44px)] font-bold tracking-[-0.03em] mb-1.5">
+                <div style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 700, letterSpacing: '-0.03em', marginBottom: 6 }}>
                   {stat.value}
                 </div>
-                <div className="text-[14px] text-white/40 uppercase tracking-widest">
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   {stat.label}
                 </div>
               </motion.div>
@@ -137,59 +258,75 @@ export default function HomePage() {
       </section>
 
       {/* ── Live Network ── */}
-      <section className="py-[120px] px-10 relative z-10">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="flex flex-col lg:flex-row items-end justify-between gap-10 mb-20">
+      <section style={{ position: 'relative', zIndex: 1, padding: '120px 40px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 40, alignItems: 'end', marginBottom: 80 }}>
             <motion.div
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
-              className="max-w-[600px]"
             >
-              <p className="text-[12px] text-[#a78bfa] uppercase tracking-[0.2em] mb-5">
+              <p style={{ fontSize: 12, color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 20 }}>
                 Real-time Grid
               </p>
-              <h2 className="font-serif-display text-[clamp(36px,4vw,54px)] leading-[1.15] tracking-[-0.025em] mb-7">
+              <h2 style={{
+                fontFamily: "'DM Serif Display', serif",
+                fontSize: 'clamp(36px, 4vw, 54px)',
+                lineHeight: 1.15,
+                letterSpacing: '-0.025em',
+                marginBottom: 28
+              }}>
                 Live Kiosk Network
               </h2>
-              <p className="text-[17px] text-white/50 leading-relaxed font-light">
+              <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, fontWeight: 300, maxWidth: 600 }}>
                 Our distributed terminal network is expanding across every major hub in Dhaka. Always within walking distance.
               </p>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               viewport={{ once: true }}
             >
-              <Link href="/explore" className="group flex items-center gap-4 text-sm font-bold text-white/60 hover:text-white transition-colors">
-                VIEW FULL NETWORK <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#a78bfa] transition-colors"><ArrowRight size={16} /></div>
+              <Link href="/explore" style={{
+                display: 'inline-flex', alignItems: 'center', gap: 12,
+                color: 'rgba(255,255,255,0.6)', fontSize: 14, fontWeight: 700, textDecoration: 'none', transition: 'color 0.3s ease'
+              }}
+              onMouseOver={e => e.currentTarget.style.color = 'white'}
+              onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.6)'}
+              >
+                VIEW FULL NETWORK
+                <div style={{
+                  width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'border-color 0.3s ease'
+                }}>
+                  <ArrowRight size={16} />
+                </div>
               </Link>
             </motion.div>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
             {loading
               ? Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
               : kiosks.length > 0
                 ? kiosks.map((k, i) => (
                     <motion.div 
                       key={k.id}
+                      className="hover-lift"
                       initial={{ opacity: 0, y: 32 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ delay: i * 0.15, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                       viewport={{ once: true }}
-                      className="hover-lift"
                     >
                       <KioskCard kiosk={k} />
                     </motion.div>
                   ))
                 : (
-                  <div className="col-span-full py-40 glass-card rounded-[48px] border-dashed border-white/10 flex flex-col items-center justify-center text-center px-6">
-                    <Printer size={64} className="text-white/10 mb-8" />
-                    <h3 className="text-3xl font-serif-display text-white mb-4">Grid Synchronizing</h3>
-                    <p className="text-white/30 max-w-xs font-light">The live network map is currently updating. Please refresh in a moment.</p>
+                  <div className="glass-card" style={{ gridColumn: '1 / -1', padding: 80, borderRadius: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                    <Printer size={64} color="rgba(255,255,255,0.1)" style={{ marginBottom: 24 }} />
+                    <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 32, marginBottom: 16 }}>Grid Synchronizing</h3>
+                    <p style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 300, maxWidth: 320 }}>The live network map is currently updating. Please refresh in a moment.</p>
                   </div>
                 )
             }
@@ -198,34 +335,61 @@ export default function HomePage() {
       </section>
 
       {/* ── Support Center ── */}
-      <section className="py-[120px] px-10 relative z-10 bg-white/[0.01] border-y border-white/5">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="text-center mb-20">
-            <p className="text-[12px] text-[#a78bfa] uppercase tracking-[0.2em] mb-4">
+      <section style={{
+        position: 'relative', zIndex: 1,
+        padding: '100px 40px',
+        background: 'rgba(255,255,255,0.015)',
+        borderTop: '1px solid rgba(255,255,255,0.05)',
+        borderBottom: '1px solid rgba(255,255,255,0.05)'
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            style={{ marginBottom: 72, textAlign: 'center' }}
+          >
+            <p style={{ fontSize: 12, color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: 16 }}>
               Support Protocol
             </p>
-            <h2 className="font-serif-display text-[clamp(32px,4vw,48px)] leading-[1.15] tracking-[-0.025em]">
+            <h2 style={{
+              fontFamily: "'DM Serif Display', serif",
+              fontSize: 'clamp(32px, 4vw, 48px)',
+              lineHeight: 1.15,
+              letterSpacing: '-0.025em'
+            }}>
               Frequently Asked Questions
             </h2>
-          </div>
-          
-          <div className="max-w-[800px] mx-auto">
+          </motion.div>
+
+          <div style={{ maxWidth: 800, margin: '0 auto' }}>
             <FAQList />
           </div>
 
           <motion.div 
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             viewport={{ once: true }}
-            className="mt-20 p-12 glass-card rounded-[40px] border border-white/10 flex flex-col md:flex-row items-center justify-between gap-10 relative overflow-hidden group"
+            className="glass-card"
+            style={{
+              marginTop: 80, padding: 48, borderRadius: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 40, flexWrap: 'wrap'
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#a78bfa0d] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative z-10 text-center md:text-left">
-              <h3 className="font-serif-display text-3xl text-white mb-2">Need direct human support?</h3>
-              <p className="text-white/40 font-light">Our engineering team is standing by 24/7 for technical assistance.</p>
+            <div>
+              <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: 28, marginBottom: 8 }}>Need direct human support?</h3>
+              <p style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 300 }}>Our engineering team is standing by 24/7 for technical assistance.</p>
             </div>
-            <Link href="/contact" className="relative z-10 px-10 py-5 rounded-full bg-white text-[#0a0a14] text-[13px] font-black uppercase tracking-widest hover:bg-[#a78bfa] hover:text-white transition-all">
+            <Link href="/contact" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              padding: '14px 28px',
+              background: 'white', color: '#0a0a14',
+              fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.05em', borderRadius: 100,
+              textDecoration: 'none', transition: 'all 0.25s ease'
+            }}
+            onMouseOver={e => { e.currentTarget.style.background = '#a78bfa'; e.currentTarget.style.color = 'white'; }}
+            onMouseOut={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#0a0a14'; }}
+            >
               Open Support Ticket
             </Link>
           </motion.div>
@@ -233,28 +397,65 @@ export default function HomePage() {
       </section>
 
       {/* ── Newsletter ── */}
-      <section className="py-[120px] px-10 relative z-10">
-        <div className="max-w-[1200px] mx-auto">
-          <motion.div 
+      <section style={{ position: 'relative', zIndex: 1, padding: '40px 40px 120px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             viewport={{ once: true }}
-            className="p-[80px_60px] rounded-[40px] bg-gradient-to-br from-[#a78bfa26] to-[#3b82f61a] border border-[#a78bfa40] text-center relative overflow-hidden"
+            style={{
+              borderRadius: 40, padding: '80px 60px',
+              background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(59,130,246,0.1) 100%)',
+              border: '1px solid rgba(167,139,250,0.25)',
+              textAlign: 'center', position: 'relative', overflow: 'hidden'
+            }}
           >
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[300px] bg-[radial-gradient(ellipse,rgba(139,92,246,0.12),transparent_70%)] pointer-events-none" />
-            
-            <div className="relative z-10">
-              <h2 className="font-serif-display text-[clamp(32px,5vw,60px)] leading-tight tracking-[-0.03em] mb-6 text-white">Stay in the Sync</h2>
-              <p className="text-[17px] text-white/45 font-light mb-12 max-w-[560px] mx-auto">Get notified about new kiosk deployments and critical network updates directly.</p>
+            {/* Decorative orb */}
+            <div aria-hidden style={{
+              position: 'absolute', top: '50%', left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 400, height: 300,
+              background: 'radial-gradient(ellipse, rgba(139,92,246,0.12), transparent 70%)',
+              pointerEvents: 'none'
+            }} />
+
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <h2 style={{
+                fontFamily: "'DM Serif Display', serif",
+                fontSize: 'clamp(32px, 5vw, 60px)',
+                lineHeight: 1.1,
+                letterSpacing: '-0.03em',
+                marginBottom: 20
+              }}>
+                Stay in the Sync
+              </h2>
+              <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.45)', marginBottom: 48, fontWeight: 300, maxWidth: 560, margin: '0 auto 48px' }}>
+                Get notified about new kiosk deployments and critical network updates directly.
+              </p>
               
-              <form className="flex flex-col sm:flex-row gap-4 max-w-[600px] mx-auto" onSubmit={(e) => e.preventDefault()}>
+              <form style={{ display: 'flex', gap: 16, maxWidth: 600, margin: '0 auto', flexWrap: 'wrap' }} onSubmit={(e) => e.preventDefault()}>
                 <input 
                   type="email" 
                   placeholder="Enter secure email address" 
-                  className="flex-1 bg-white/5 border border-white/10 rounded-full py-5 px-8 text-white placeholder:text-white/20 outline-none focus:border-[#a78bfa80] transition-all"
+                  style={{
+                    flex: 1, minWidth: 260,
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 100, padding: '16px 32px', color: 'white', outline: 'none'
+                  }}
                 />
-                <button className="px-10 py-5 rounded-full bg-white text-[#0a0a14] font-black uppercase text-[13px] tracking-widest hover:bg-[#a78bfa] hover:text-white transition-all">
+                <button
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '16px 36px',
+                    background: 'white', color: '#0a0a14',
+                    fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.05em', borderRadius: 100,
+                    border: 'none', cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseOver={e => { e.currentTarget.style.background = '#a78bfa'; e.currentTarget.style.color = 'white'; }}
+                  onMouseOut={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#0a0a14'; }}
+                >
                   Subscribe
                 </button>
               </form>
@@ -276,20 +477,28 @@ function FAQList() {
     { q: 'What is the data retention policy for uploaded assets?', a: 'All uploaded document buffers are encrypted at rest and automatically purged from our cloud environment within a 24-hour cycle.' },
   ];
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {faqs.map((f, i) => (
-        <div key={i} className="glass-card overflow-hidden rounded-[24px]">
+        <div key={i} className="glass-card" style={{ overflow: 'hidden', borderRadius: 24 }}>
           <button 
             onClick={() => setOpen(open === i ? null : i)} 
-            className="w-full flex items-center justify-between p-8 text-left hover:bg-white/[0.02] transition-all group"
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: 32, textAlign: 'left', background: 'transparent', border: 'none', cursor: 'pointer'
+            }}
           >
-            <span className="text-[19px] font-bold text-white/80 group-hover:text-white flex items-center gap-6 transition-colors">
-              <span className="text-[13px] font-serif-display text-[#a78bfa66]">0{i+1}</span>
+            <span style={{ fontSize: 19, fontWeight: 700, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 24 }}>
+              <span style={{ fontSize: 13, fontFamily: "'DM Serif Display', serif", color: 'rgba(167,139,250,0.4)' }}>0{i+1}</span>
               {f.q}
             </span>
             <motion.div 
               animate={{ rotate: open === i ? 180 : 0 }}
-              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${open === i ? 'bg-white text-[#0a0a14]' : 'bg-white/5 text-white/20'}`}
+              style={{
+                width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: open === i ? 'white' : 'rgba(255,255,255,0.05)',
+                color: open === i ? '#0a0a14' : 'rgba(255,255,255,0.2)',
+                transition: 'all 0.3s ease'
+              }}
             >
               <ChevronDown size={18} />
             </motion.div>
@@ -301,9 +510,9 @@ function FAQList() {
                 animate={{ height: 'auto', opacity: 1 }} 
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="overflow-hidden"
+                style={{ overflow: 'hidden' }}
               >
-                <div className="px-8 pb-8 pt-0 ml-14 text-white/45 leading-relaxed text-[16px] font-light max-w-[700px]">
+                <div style={{ padding: '0 32px 32px', marginLeft: 56, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7, fontSize: 16, fontWeight: 300, maxWidth: 700 }}>
                   {f.a}
                 </div>
               </motion.div>

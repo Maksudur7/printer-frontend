@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Providers } from "@/lib/providers";
+import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,7 +34,6 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} antialiased`}
       >
-        <Providers>
           <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#FFEF91] to-[#d4f0a0]">
             <Navbar />
             <main className="flex-1 flex flex-col items-center justify-center">

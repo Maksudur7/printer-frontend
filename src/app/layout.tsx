@@ -33,9 +33,9 @@ export default function RootLayout({
         className={`${inter.variable} ${outfit.variable} antialiased`}
       >
         <Providers>
-          <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#FFEF91] to-[#d4f0a0]">
             <Navbar />
-            <main className="flex-1 flex flex-col">
+            <main className="flex-1 flex flex-col items-center justify-center">
               {children}
             </main>
             <Footer />

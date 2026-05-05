@@ -2,12 +2,12 @@
 
 @theme {
   --color-primary: #468432;
-  --color-secondary: #9ad872;
-  --color-background: #ffef91;
-  --color-accent: #ffa02e;
-  --color-text-dark: #1a2e0d;
-  --color-white: #ffffff;
-  --color-lime: #d4f0a0;
+  --color-secondary: #9AD872;
+  --color-background: #FFEF91;
+  --color-accent: #FFA02E;
+  --color-text-dark: #1A2E0D;
+  --color-white: #FFFFFF;
+  --color-lime-bg: #d4f0a0;
 
   --font-inter: var(--font-inter-var), 'Inter', system-ui, sans-serif;
   --font-outfit: var(--font-outfit-var), 'Outfit', system-ui, sans-serif;
@@ -26,19 +26,14 @@ body {
 }
 
 body {
-  background: linear-gradient(135deg, var(--color-background) 0%, var(--color-lime) 100%);
+  background: linear-gradient(135deg, var(--color-background) 0%, var(--color-lime-bg) 100%);
   color: var(--color-text-dark);
   font-family: var(--font-inter);
 }
 
 /* Glassmorphism utility */
 .glass-card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 1.5rem; /* rounded-2xl */
-  box-shadow: 0 20px 60px rgba(70, 132, 50, 0.1);
+  @apply backdrop-blur-md bg-white/30 border border-white/40 rounded-2xl shadow-xl transition-all duration-300;
 }
 
 /* Typography */
@@ -46,31 +41,36 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-outfit);
   color: var(--color-primary);
   font-weight: 700;
+  @apply tracking-tight;
 }
 
 /* Buttons */
 .btn-primary {
-  @apply bg-[#FFA02E] text-white font-semibold rounded-xl px-6 py-3 transition-all duration-300 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:hover:scale-100 whitespace-nowrap min-h-[44px] flex items-center justify-center;
+  @apply bg-[#FFA02E] text-white font-bold rounded-xl px-8 py-4 transition-all duration-300 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:hover:scale-100 whitespace-nowrap min-h-[44px] flex items-center justify-center text-lg;
 }
 
 .btn-secondary {
-  @apply bg-[#9AD872] text-[#1A2E0D] font-semibold rounded-xl px-6 py-3 transition-all duration-300 hover:scale-105 hover:shadow-md whitespace-nowrap min-h-[44px] flex items-center justify-center;
+  @apply bg-[#9AD872] text-[#1A2E0D] font-bold rounded-xl px-8 py-4 transition-all duration-300 hover:scale-105 hover:shadow-md disabled:opacity-50 disabled:hover:scale-100 whitespace-nowrap min-h-[44px] flex items-center justify-center text-lg;
+}
+
+.btn-accent {
+  @apply bg-[#FFA02E] text-white font-bold rounded-xl px-8 py-4 transition-all duration-300 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:hover:scale-100 whitespace-nowrap min-h-[44px] flex items-center justify-center text-lg;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--color-background); }
-::-webkit-scrollbar-thumb { background: var(--color-secondary); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: 10px; }
 
 /* Selection */
 ::selection { background: var(--color-accent); color: white; }
 
 /* Animation helpers */
-.animate-pulse-subtle {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }

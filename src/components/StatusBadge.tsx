@@ -8,10 +8,10 @@ interface StatusBadgeProps {
 }
 
 const statusConfig: Record<KioskStatus, { label: string; bg: string; dot: string; text: string }> = {
-  ONLINE:        { label: 'Online',        bg: '#dcfce7', dot: '#22c55e', text: '#166534' },
-  OFFLINE:       { label: 'Offline',       bg: '#fee2e2', dot: '#ef4444', text: '#991b1b' },
-  MAINTENANCE:   { label: 'Maintenance',   bg: '#fef9c3', dot: '#eab308', text: '#854d0e' },
-  OUT_OF_PAPER:  { label: 'Out of Paper',  bg: '#ffedd5', dot: '#f97316', text: '#9a3412' },
+  ONLINE:        { label: 'ONLINE',        bg: '#d4f0a0', dot: '#468432', text: '#1A2E0D' },
+  OFFLINE:       { label: 'OFFLINE',       bg: '#fee2e2', dot: '#ef4444', text: '#991b1b' },
+  MAINTENANCE:   { label: 'MAINTENANCE',   bg: '#FFEF91', dot: '#FFA02E', text: '#854d0e' },
+  OUT_OF_PAPER:  { label: 'OUT OF PAPER',  bg: '#ffedd5', dot: '#f97316', text: '#9a3412' },
 };
 
 export default function StatusBadge({ status, showLabel = true }: StatusBadgeProps) {
@@ -19,8 +19,8 @@ export default function StatusBadge({ status, showLabel = true }: StatusBadgePro
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-      style={{ backgroundColor: cfg.bg, color: cfg.text }}
+      className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm"
+      style={{ backgroundColor: cfg.bg, color: cfg.text, border: `1px solid ${cfg.dot}20` }}
     >
       <span
         className="w-2 h-2 rounded-full animate-pulse"

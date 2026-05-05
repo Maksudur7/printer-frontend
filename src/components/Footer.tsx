@@ -11,10 +11,10 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                <Printer size={18} className="text-white" />
+                <Printer size={18} className="text-[#9AD872]" />
               </div>
               <span
-                className="text-2xl font-black tracking-tighter"
+                className="text-2xl font-black tracking-tighter uppercase"
                 style={{ fontFamily: 'var(--font-outfit)' }}
               >
                 PrintKiosk
@@ -30,13 +30,13 @@ export default function Footer() {
             <h3 className="text-xs font-black uppercase tracking-widest text-white/40">Connect</h3>
             <ul className="space-y-3">
               <li>
-                <a href="tel:+8801700000000" className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors">
+                <a href="tel:+8801700000000" className="flex items-center gap-2 text-sm text-white/80 hover:text-[#9AD872] transition-colors">
                   <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center"><Phone size={12} /></div>
                   <span className="font-bold">+880 1700-000000</span>
                 </a>
               </li>
               <li>
-                <a href="mailto:support@printkiosk.com" className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors">
+                <a href="mailto:support@printkiosk.com" className="flex items-center gap-2 text-sm text-white/80 hover:text-[#9AD872] transition-colors">
                   <div className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center"><Mail size={12} /></div>
                   <span className="font-bold">support@printkiosk.com</span>
                 </a>

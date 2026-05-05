@@ -4,8 +4,8 @@ import { Suspense, useCallback, useState, useRef, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  UploadCloud, FileText, X, Plus, Minus, Loader2, ArrowRight, Palette, Printer,
-  Layers, RotateCcw, AlertCircle, Info,
+  UploadCloud, FileText, X, Plus, Minus, Loader2, ArrowRight, Printer,
+  Layers, RotateCcw, AlertCircle, Info, QrCode,
 } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
 import { apiClient } from '@/lib/apiClient';
@@ -126,10 +126,61 @@ function UploadContent() {
     }
   };
 
-  /* ── Redirect if no kiosk ────────────────────────────── */
+  /* ── Redirect if no kiosk (scan required) ───────────── */
   useEffect(() => {
-    if (!deviceId) router.replace('/');
+    if (!deviceId) {
+      const timer = setTimeout(() => router.replace('/'), 3000);
+      return () => clearTimeout(timer);
+    }
   }, [deviceId, router]);
+
+  /* ── No Kiosk / Not Scanned ──────────────────────────── */
+  if (!deviceId) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex-1 flex items-center justify-center w-full px-4 py-16"
+      >
+        <div className="glass-card p-10 text-center max-w-sm w-full relative overflow-hidden">
+          {/* Top accent line */}
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent" />
+
+          {/* Icon */}
+          <div className="w-24 h-24 rounded-[2rem] bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto mb-6 relative">
+            <QrCode size={48} className="text-[var(--color-accent)]" />
+            <motion.div
+              animate={{ opacity: [0, 0.6, 0], scale: [1, 1.3, 1] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="absolute inset-0 border-4 border-[var(--color-accent)]/30 rounded-[2rem]"
+            />
+          </div>
+
+          <h2 className="text-2xl font-black uppercase tracking-tighter mb-3">
+            Scan <span className="text-[var(--color-accent)]">Required</span>
+          </h2>
+          <p className="text-[var(--color-text-dark)] opacity-60 text-sm leading-relaxed mb-8 font-medium">
+            You must scan the QR code on the kiosk first before uploading your document.
+          </p>
+
+          {/* Countdown hint */}
+          <div className="flex items-center justify-center gap-2 text-xs font-bold text-[var(--color-text-dark)] opacity-40 uppercase tracking-widest mb-6">
+            <Loader2 size={14} className="animate-spin" />
+            Redirecting to Home...
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.replace('/')}
+            className="btn-accent w-full py-4 font-black text-sm uppercase tracking-widest"
+          >
+            Go to Home
+          </motion.button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

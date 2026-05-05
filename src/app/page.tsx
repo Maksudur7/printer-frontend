@@ -182,7 +182,13 @@ function LandingContent() {
           className="btn-accent w-full py-6 text-2xl font-black uppercase tracking-tighter flex items-center justify-center gap-4 shadow-3xl shadow-orange-500/40 relative overflow-hidden group/btn"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => router.push(`/upload?kiosk=${deviceId}`)}
+          onClick={() => {
+            if (deviceId) {
+              router.push(`/upload?kiosk=${deviceId}`);
+            } else {
+              router.push('/');
+            }
+          }}
         >
           <span className="relative z-10">Start Printing</span>
           <ArrowRight size={32} className="relative z-10 group-hover/btn:translate-x-2 transition-transform" />

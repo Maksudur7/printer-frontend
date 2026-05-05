@@ -34,18 +34,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${outfit.variable} antialiased`}
       >
-        <Providers>
-          <ThemeProvider>
-            <AuthProvider>
-              <div className="min-h-screen flex flex-col">
-                <Navbar />
-                <main className="flex-1 flex flex-col">
-                  {children}
-                </main>
-                <Footer />
-              </div>
-            </AuthProvider>
-          </ThemeProvider>
+          <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#FFEF91] to-[#d4f0a0]">
+            <Navbar />
+            <main className="flex-1 flex flex-col items-center justify-center">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </Providers>
       </body>
     </html>

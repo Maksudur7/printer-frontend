@@ -5,7 +5,7 @@ export interface Kiosk {
   id: string;
   deviceId: string;
   name: string;
-  location: string;
+  location?: string;
   status: KioskStatus;
   createdAt: string;
   updatedAt: string;
@@ -35,12 +35,11 @@ export interface Order {
 }
 
 // ─── Payment ─────────────────────────────────────────────
-export type PaymentMethod = 'CASH' | 'BKASH' | 'NAGAD' | 'SSLCOMMERZ';
+export type PaymentMethod = 'CASH' | 'BKASH' | 'NAGAD' | 'STRIPE' | 'SSLCOMMERZ';
 
 export interface PaymentInitiateResponse {
-  paymentUrl?: string;
-  message: string;
-  success?: boolean;
+  paymentUrl: string;
+  message?: string;
 }
 
 // ─── API Error ───────────────────────────────────────────

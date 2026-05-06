@@ -1,5 +1,5 @@
 // API base URL - points to the NestJS backend
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://printer-project-two.vercel.app';
 
 // ── Kiosk ──────────────────────────────────────────────────────────────
 export async function getAllKiosks() {

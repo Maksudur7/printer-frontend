@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Printer, Plus, Search, RefreshCw, Signal, SignalLow, AlertTriangle, 
-  Settings2, Activity, MapPin, Battery, Cpu
+  Settings2, Activity, MapPin, Battery, Cpu, Loader2, X, Download, QrCode
 } from 'lucide-react';
 import { apiClient } from '@/lib/apiClient';
 
@@ -16,18 +16,26 @@ interface Kiosk {
   paperLevel: number;
   inkLevel: number;
   lastHeartbeat: string;
+  qrCodeUrl: string; // Backend generated QR code
 }
 
 export default function KiosksPage() {
   const [kiosks, setKiosks] = useState<Kiosk[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  
+  // Registration Form State
+  const [newName, setNewName] = useState('');
+  const [newDeviceId, setNewDeviceId] = useState('');
+  const [newLocation, setNewLocation] = useState('');
+  const [regLoading, setRegLoading] = useState(false);
 
   const fetchKiosks = async () => {
     setLoading(true);
     try {
       const res = await apiClient.get('/v1/kiosk/admin/stats');
-      setKiosks(res.data.devices || []);
+      setKiosks(res.data.devices || res.data.kioskFleet || []);
     } catch (err) {
       console.error('Failed to fetch kiosks:', err);
     } finally {
@@ -39,9 +47,40 @@ export default function KiosksPage() {
     fetchKiosks();
   }, []);
 
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegLoading(true);
+    try {
+      await apiClient.post('/v1/kiosk/register', {
+        name: newName,
+        deviceId: newDeviceId,
+        location: newLocation
+      });
+      setShowModal(false);
+      setNewName('');
+      setNewDeviceId('');
+      setNewLocation('');
+      fetchKiosks();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Registration failed');
+    } finally {
+      setRegLoading(false);
+    }
+  };
+
+  const downloadQR = (qrDataUrl: string, deviceId: string) => {
+    if (!qrDataUrl) return;
+    const link = document.createElement('a');
+    link.href = qrDataUrl;
+    link.download = `kiosk-${deviceId}-qr.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const filteredKiosks = kiosks.filter(k => 
-    k.name.toLowerCase().includes(search.toLowerCase()) || 
-    k.deviceId.toLowerCase().includes(search.toLowerCase())
+    (k.name || '').toLowerCase().includes(search.toLowerCase()) || 
+    (k.deviceId || '').toLowerCase().includes(search.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -79,7 +118,7 @@ export default function KiosksPage() {
            >
               <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
            </button>
-           <button className="btn-primary px-8 py-4 flex items-center gap-2">
+           <button onClick={() => setShowModal(true)} className="btn-primary px-8 py-4 flex items-center gap-2 shadow-xl shadow-green-900/10">
               <Plus size={20} /> Register New
            </button>
         </div>
@@ -89,7 +128,10 @@ export default function KiosksPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {loading ? (
           Array(3).fill(0).map((_, i) => (
-            <div key={i} className="glass-card p-8 h-64 animate-pulse bg-white/20" />
+            <div key={i} className="glass-card p-8 h-80 animate-pulse bg-white/20 flex flex-col justify-center items-center">
+               <Loader2 className="animate-spin text-[var(--color-primary)] mb-4" size={32} />
+               <p className="text-[10px] font-black uppercase opacity-40">Scanning Network...</p>
+            </div>
           ))
         ) : filteredKiosks.length === 0 ? (
           <div className="col-span-full py-20 text-center glass-card">
@@ -102,7 +144,7 @@ export default function KiosksPage() {
               key={kiosk.deviceId}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-card p-8 hover:scale-[1.02] transition-all group"
+              className="glass-card p-8 hover:scale-[1.02] transition-all group relative overflow-hidden"
             >
               <div className="flex items-start justify-between mb-8">
                  <div className="flex items-center gap-4">
@@ -110,13 +152,39 @@ export default function KiosksPage() {
                        <Printer size={28} className="text-[var(--color-primary)]" />
                     </div>
                     <div>
-                       <h3 className="text-xl font-black uppercase tracking-tighter leading-none mb-1">{kiosk.name}</h3>
+                       <h3 className="text-xl font-black uppercase tracking-tighter leading-none mb-1">{kiosk.name || 'Device'}</h3>
                        <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{kiosk.deviceId}</p>
                     </div>
                  </div>
                  <div className={`px-4 py-1.5 rounded-full flex items-center gap-2 text-[8px] font-black uppercase tracking-widest text-white ${getStatusColor(kiosk.status)} shadow-lg`}>
                     <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                    {kiosk.status}
+                    {kiosk.status || 'OFFLINE'}
+                 </div>
+              </div>
+
+              {/* QR Code Section (Using Backend Data URL) */}
+              <div className="mb-8 flex items-center gap-6 p-4 bg-white/40 rounded-3xl border border-white/60 group-hover:bg-white/60 transition-colors">
+                 <div className="bg-white p-2 rounded-xl shadow-inner shrink-0">
+                    {kiosk.qrCodeUrl ? (
+                      <img 
+                        src={kiosk.qrCodeUrl} 
+                        alt="Kiosk QR"
+                        className="w-16 h-16"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg">
+                        <QrCode className="opacity-20" size={24} />
+                      </div>
+                    )}
+                 </div>
+                 <div className="flex-1">
+                    <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-2">Device QR</p>
+                    <button 
+                      onClick={() => downloadQR(kiosk.qrCodeUrl, kiosk.deviceId)}
+                      className="flex items-center gap-2 text-[10px] font-black uppercase text-[var(--color-primary)] hover:underline"
+                    >
+                       <Download size={14} /> Download
+                    </button>
                  </div>
               </div>
 
@@ -154,7 +222,7 @@ export default function KiosksPage() {
 
               <div className="mt-8 pt-6 border-t border-white/60 flex items-center justify-between">
                  <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-widest opacity-40">
-                    <MapPin size={12} /> {kiosk.location}
+                    <MapPin size={12} /> {kiosk.location || 'Unknown Location'}
                  </div>
                  <button className="p-2.5 rounded-xl hover:bg-[var(--color-primary)] hover:text-white transition-all text-gray-500">
                     <Settings2 size={16} />
@@ -164,6 +232,83 @@ export default function KiosksPage() {
           ))
         )}
       </div>
+
+      {/* Registration Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+             <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               onClick={() => setShowModal(false)}
+               className="absolute inset-0 bg-black/40 backdrop-blur-md"
+             />
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0, y: 20 }}
+               animate={{ scale: 1, opacity: 1, y: 0 }}
+               exit={{ scale: 0.9, opacity: 0, y: 20 }}
+               className="relative bg-white/80 backdrop-blur-3xl rounded-[3rem] p-10 max-w-lg w-full shadow-2xl border border-white"
+             >
+                <button onClick={() => setShowModal(false)} className="absolute top-8 right-8 p-3 hover:bg-black/5 rounded-2xl transition-colors">
+                   <X size={24} />
+                </button>
+
+                <div className="mb-10">
+                   <div className="w-16 h-16 bg-[var(--color-primary)] rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-green-900/20">
+                      <Printer className="text-white" size={32} />
+                   </div>
+                   <h2 className="text-3xl font-black uppercase tracking-tighter mb-2">New <span className="text-[var(--color-primary)]">Kiosk</span></h2>
+                   <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Register a device to the smart fleet</p>
+                </div>
+
+                <form onSubmit={handleRegister} className="space-y-6">
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Kiosk Name</label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        placeholder="e.g. Dhaka University Library" 
+                        className="input-field" 
+                      />
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Device Serial ID</label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={newDeviceId}
+                        onChange={(e) => setNewDeviceId(e.target.value)}
+                        placeholder="e.g. KSK-2024-001" 
+                        className="input-field" 
+                      />
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-1">Location Details</label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={newLocation}
+                        onChange={(e) => setNewLocation(e.target.value)}
+                        placeholder="e.g. Sector-4, Ground Floor" 
+                        className="input-field" 
+                      />
+                   </div>
+
+                   <button 
+                     type="submit" 
+                     disabled={regLoading}
+                     className="btn-primary w-full py-5 text-lg shadow-xl shadow-green-900/10 flex items-center justify-center gap-3"
+                   >
+                      {regLoading ? <Loader2 className="animate-spin" size={24} /> : <><Plus size={20} /> Register Device</>}
+                   </button>
+                </form>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -5,7 +5,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import {
-  CreditCard, ListOrdered, Printer, CheckCircle2, XCircle, Phone, MapPin, Loader2, FileText, Layout, Sparkles, ShieldCheck
+  CreditCard, ListOrdered, Printer, CheckCircle2, XCircle, Phone, MapPin, Loader2, FileText, Layout, Sparkles, ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 import { apiClient } from '@/lib/apiClient';
 import type { Order, PrintStatus } from '@/lib/types';
@@ -58,7 +59,7 @@ function TrackContent() {
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mx-auto px-6 py-20">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card w-full p-12 text-center">
           <div className="w-20 h-20 bg-[var(--color-primary)]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-             <AlertCircle className="text-[var(--color-primary)]" size={40} />
+            <AlertCircle className="text-[var(--color-primary)]" size={40} />
           </div>
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-2">No Order Found</h2>
           <p className="text-sm font-bold opacity-50 mb-10 leading-relaxed">It seems you don't have an active print session right now.</p>
@@ -109,7 +110,7 @@ function TrackContent() {
         {/* Main Status Area */}
         <div className="glass-card p-10 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-primary)]/5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-[var(--color-accent)]/10 transition-colors" />
-          
+
           <AnimatePresence mode="wait">
             {isFailed ? (
               <motion.div key="failed" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
@@ -134,7 +135,7 @@ function TrackContent() {
                 <h2 className="text-4xl font-black mb-4 text-green-700 uppercase tracking-tighter leading-none">Ready to Collect!</h2>
                 <p className="text-lg text-green-700/80 font-bold mb-12 max-w-sm mx-auto">Success! Your document is waiting for you in the printer tray.</p>
                 <button onClick={() => router.replace('/')} className="btn-primary w-full py-7 text-2xl !bg-green-600 !shadow-green-600/20">
-                   Back to Home
+                  Back to Home
                 </button>
               </motion.div>
             ) : (
@@ -151,23 +152,22 @@ function TrackContent() {
                       <div key={step.key} className={`flex gap-8 items-start transition-opacity duration-500 ${!isDone && !isActive ? 'opacity-30' : 'opacity-100'}`}>
                         <div className="relative flex items-center justify-center shrink-0">
                           <motion.div
-                            animate={isActive ? { 
-                                scale: [1, 1.15, 1], 
-                                boxShadow: ['0 0 0 0px var(--color-primary)', '0 0 0 12px rgba(70,132,50,0.1)', '0 0 0 0px var(--color-primary)'] 
+                            animate={isActive ? {
+                              scale: [1, 1.15, 1],
+                              boxShadow: ['0 0 0 0px var(--color-primary)', '0 0 0 12px rgba(70,132,50,0.1)', '0 0 0 0px var(--color-primary)']
                             } : {}}
                             transition={{ repeat: Infinity, duration: 2.5 }}
-                            className={`w-12 h-12 rounded-2xl flex items-center justify-center z-10 transition-all duration-700 shadow-xl ${
-                                isDone ? 'bg-green-500 text-white shadow-green-500/20' : 
-                                isActive ? 'bg-[var(--color-primary)] text-white shadow-[var(--color-primary)]/20' : 
-                                'bg-white/80 text-[var(--color-text-dark)]/40'
-                            }`}
+                            className={`w-12 h-12 rounded-2xl flex items-center justify-center z-10 transition-all duration-700 shadow-xl ${isDone ? 'bg-green-500 text-white shadow-green-500/20' :
+                                isActive ? 'bg-[var(--color-primary)] text-white shadow-[var(--color-primary)]/20' :
+                                  'bg-white/80 text-[var(--color-text-dark)]/40'
+                              }`}
                           >
                             {isDone ? <CheckCircle2 size={24} className="animate-pulse" /> : step.icon}
                           </motion.div>
 
                           {/* Connection line highlight */}
                           {isDone && (
-                             <div className="absolute top-12 left-1/2 -translate-x-1/2 w-1 h-12 bg-green-500 z-0" />
+                            <div className="absolute top-12 left-1/2 -translate-x-1/2 w-1 h-12 bg-green-500 z-0" />
                           )}
                         </div>
 
@@ -197,41 +197,41 @@ function TrackContent() {
 
         {/* Polling Indicator */}
         {!isCompleted && !isFailed && (
-           <div className="flex items-center justify-center gap-3 py-4 glass-panel border-white/60">
-              <div className="flex items-center gap-1.5">
-                 <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
-                 <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse delay-75" />
-                 <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse delay-150" />
-              </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--color-primary)] opacity-60">Syncing Live Updates</p>
-           </div>
+          <div className="flex items-center justify-center gap-3 py-4 glass-panel border-white/60">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse" />
+              <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse delay-75" />
+              <div className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-pulse delay-150" />
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--color-primary)] opacity-60">Syncing Live Updates</p>
+          </div>
         )}
 
         {/* Order Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           {order && (
-             <div className="glass-card p-6 flex items-center gap-5">
-                <div className="w-16 h-16 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center shrink-0">
-                   <FileText size={32} className="text-[var(--color-primary)]" />
-                </div>
-                <div className="min-w-0">
-                   <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Document</p>
-                   <p className="text-base font-black truncate text-[var(--color-text-dark)] pr-2">{order.fileName}</p>
-                   <p className="text-xs font-bold opacity-60 uppercase">{order.pageCount} Pages • {order.isColor ? 'Color' : 'B&W'}</p>
-                </div>
-             </div>
-           )}
+          {order && (
+            <div className="glass-card p-6 flex items-center gap-5">
+              <div className="w-16 h-16 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center shrink-0">
+                <FileText size={32} className="text-[var(--color-primary)]" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Document</p>
+                <p className="text-base font-black truncate text-[var(--color-text-dark)] pr-2">{order.fileName}</p>
+                <p className="text-xs font-bold opacity-60 uppercase">{order.pageCount} Pages • {order.isColor ? 'Color' : 'B&W'}</p>
+              </div>
+            </div>
+          )}
 
-           <div className="glass-card p-6 flex items-center gap-5">
-              <div className="w-16 h-16 bg-[var(--color-accent)]/10 rounded-2xl flex items-center justify-center shrink-0">
-                 <ShieldCheck size={32} className="text-[var(--color-accent)]" />
-              </div>
-              <div>
-                 <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Security</p>
-                 <p className="text-base font-black text-[var(--color-text-dark)] leading-tight">Encryption Active</p>
-                 <p className="text-xs font-bold opacity-60 uppercase">Doc ID: {orderId.slice(0, 8)}</p>
-              </div>
-           </div>
+          <div className="glass-card p-6 flex items-center gap-5">
+            <div className="w-16 h-16 bg-[var(--color-accent)]/10 rounded-2xl flex items-center justify-center shrink-0">
+              <ShieldCheck size={32} className="text-[var(--color-accent)]" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Security</p>
+              <p className="text-base font-black text-[var(--color-text-dark)] leading-tight">Encryption Active</p>
+              <p className="text-xs font-bold opacity-60 uppercase">Doc ID: {orderId.slice(0, 8)}</p>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>

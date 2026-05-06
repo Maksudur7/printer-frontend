@@ -28,7 +28,7 @@ export default function AdminUsersPage() {
    const fetchUsers = async () => {
       setLoading(true);
       try {
-         const res = await apiClient.get('/v1/auth/all-admins');
+         const res = await apiClient.get('/v1/auth/all-users');
          setUsers(res.data);
       } catch (err) {
          console.error('Failed to fetch users:', err);
@@ -44,7 +44,8 @@ export default function AdminUsersPage() {
    const handleApprove = async (id: string) => {
       setActionLoading(id);
       try {
-         await apiClient.post(`/v1/auth/approve-admin/${id}`, { approve: true });
+         // Documentation says: PATCH /v1/auth/user/:id
+         await apiClient.patch(`/v1/auth/user/${id}`, { isApproved: true });
          setUsers(users.map(u => u.id === id ? { ...u, isApproved: true } : u));
       } catch (err) {
          console.error('Approval failed:', err);

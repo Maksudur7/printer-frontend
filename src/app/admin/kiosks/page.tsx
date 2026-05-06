@@ -79,17 +79,6 @@ export default function KiosksPage() {
     }
   };
 
-  const handleDelete = async (deviceId: string) => {
-    if (!confirm('Are you sure you want to delete this kiosk? This action cannot be undone.')) return;
-    
-    try {
-      await apiClient.post(`/v1/kiosk/admin/delete/${deviceId}`);
-      fetchKiosks();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Delete failed');
-    }
-  };
-
   const downloadQR = (qrDataUrl: string, deviceId: string) => {
     if (!qrDataUrl) return;
     const link = document.createElement('a');
@@ -242,14 +231,22 @@ export default function KiosksPage() {
                  </div>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-white/60 flex items-center justify-between">
-                 <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-widest opacity-40">
-                    <MapPin size={12} /> {kiosk.location || 'Unknown Location'}
-                 </div>
-                 <button className="p-2.5 rounded-xl hover:bg-[var(--color-primary)] hover:text-white transition-all text-gray-500">
-                    <Settings2 size={16} />
-                 </button>
-              </div>
+               <div className="mt-8 pt-6 border-t border-white/60 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[8px] font-black uppercase tracking-widest opacity-40">
+                     <MapPin size={12} /> {kiosk.location || 'Unknown Location'}
+                  </div>
+                  <div className="flex items-center gap-2">
+                     <button className="p-2.5 rounded-xl hover:bg-gray-100 transition-all text-gray-500">
+                        <Settings2 size={16} />
+                     </button>
+                     <button 
+                       onClick={() => handleDelete(kiosk.deviceId)}
+                       className="p-2.5 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all text-gray-400"
+                     >
+                        <Trash2 size={16} />
+                     </button>
+                  </div>
+               </div>
             </motion.div>
           ))
         )}

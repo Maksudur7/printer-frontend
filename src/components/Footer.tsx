@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Printer, Phone, Mail, MapPin, Globe } from 'lucide-react';
 
 export default function Footer() {
@@ -63,6 +64,7 @@ export default function Footer() {
             © {new Date().getFullYear()} PrintKiosk • Built for speed
           </p>
           <div className="flex items-center gap-6">
+            <Link href="/admin/login" className="text-[10px] font-black uppercase tracking-widest text-[var(--color-accent)] cursor-pointer hover:text-white transition-colors">Admin Portal</Link>
             <span className="text-[10px] font-black uppercase tracking-widest text-white/30 cursor-pointer hover:text-white transition-colors">Terms</span>
             <span className="text-[10px] font-black uppercase tracking-widest text-white/30 cursor-pointer hover:text-white transition-colors">Privacy</span>
           </div>

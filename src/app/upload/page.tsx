@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   UploadCloud, FileText, X, Plus, Minus, Loader2, ArrowRight, Printer,
-  Layers, RotateCcw, AlertCircle, Info, QrCode,
+  Layers, RotateCcw, AlertCircle, Info, QrCode, Mail, Phone, Palette, Layout
 } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
 import { apiClient } from '@/lib/apiClient';
@@ -66,7 +66,6 @@ function UploadContent() {
         const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
         setPageCount(pdfDoc.getPageCount());
       } else {
-        // Images are always 1 page
         setPageCount(1);
       }
     } catch (err) {
@@ -137,260 +136,166 @@ function UploadContent() {
   /* ── No Kiosk / Not Scanned ──────────────────────────── */
   if (!deviceId) {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex-1 flex items-center justify-center w-full px-4 py-16"
-      >
-        <div className="glass-card p-10 text-center max-w-sm w-full relative overflow-hidden">
-          {/* Top accent line */}
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent" />
-
-          {/* Icon */}
+      <div className="flex-1 flex items-center justify-center w-full px-6 py-16">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-10 text-center max-w-sm w-full relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)]" />
           <div className="w-24 h-24 rounded-[2rem] bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto mb-6 relative">
             <QrCode size={48} className="text-[var(--color-accent)]" />
-            <motion.div
-              animate={{ opacity: [0, 0.6, 0], scale: [1, 1.3, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="absolute inset-0 border-4 border-[var(--color-accent)]/30 rounded-[2rem]"
-            />
+            <div className="absolute inset-0 border-4 border-[var(--color-accent)]/20 rounded-[2rem] animate-ping" />
           </div>
-
-          <h2 className="text-2xl font-black uppercase tracking-tighter mb-3">
-            Scan <span className="text-[var(--color-accent)]">Required</span>
-          </h2>
-          <p className="text-[var(--color-text-dark)] opacity-60 text-sm leading-relaxed mb-8 font-medium">
-            You must scan the QR code on the kiosk first before uploading your document.
+          <h2 className="text-3xl font-black uppercase mb-3">Scan Required</h2>
+          <p className="text-sm opacity-70 mb-8 font-bold leading-relaxed">
+            Please scan the QR code on the kiosk first to start your session.
           </p>
-
-          {/* Countdown hint */}
-          <div className="flex items-center justify-center gap-2 text-xs font-bold text-[var(--color-text-dark)] opacity-40 uppercase tracking-widest mb-6">
-            <Loader2 size={14} className="animate-spin" />
-            Redirecting to Home...
+          <div className="flex items-center justify-center gap-2 text-xs font-black text-[var(--color-primary)] animate-pulse">
+            <Loader2 size={16} className="animate-spin" /> Redirecting...
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => router.replace('/')}
-            className="btn-accent w-full py-4 font-black text-sm uppercase tracking-widest"
-          >
-            Go to Home
-          </motion.button>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      className="flex-1 flex flex-col items-center justify-start w-full max-w-2xl mx-auto px-4 py-8"
-    >
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold tracking-tight mb-2" style={{ fontFamily: 'var(--font-outfit)', color: 'var(--color-primary)' }}>
-          Print Your Document
-        </h1>
-        <p className="text-sm text-[var(--color-text-dark)] opacity-70">
-          Upload, configure, and print in seconds.
-        </p>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-3xl mx-auto px-6 py-12">
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">Configure <span className="text-[var(--color-accent)]">Print</span></h1>
+        <p className="text-sm font-bold opacity-60">Complete your details to start the printing process.</p>
       </div>
 
-      <div className="w-full space-y-6">
-        {/* Drag & Drop Zone */}
-        <motion.div
-          layout
-          className={`glass-card p-10 border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-4 ${
-            dragging ? 'border-[var(--color-accent)] bg-white/50 scale-[1.02]' : 'border-white/40 hover:border-white/60'
-          }`}
-          onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
+      <div className="space-y-6">
+        {/* File Dropzone */}
+        <div
           onClick={() => inputRef.current?.click()}
+          onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
+          className={`glass-card p-12 border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-4 ${
+            dragging ? 'border-[var(--color-accent)] scale-[1.02] bg-white/60' : 'border-white/40 hover:border-white/80'
+          }`}
         >
-          <input
-            ref={inputRef} type="file" className="hidden"
-            accept={ACCEPTED.join(',')}
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f); }}
-          />
-
+          <input ref={inputRef} type="file" className="hidden" accept={ACCEPTED.join(',')} onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f); }} />
           <AnimatePresence mode="wait">
             {isParsing ? (
-              <motion.div key="parsing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-3">
-                <Loader2 className="animate-spin text-[var(--color-primary)]" size={40} />
-                <p className="text-sm font-medium text-[var(--color-primary)]">Analyzing pages...</p>
+              <motion.div key="parsing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-4">
+                <Loader2 className="animate-spin text-[var(--color-primary)]" size={48} />
+                <p className="font-black uppercase tracking-widest text-xs text-[var(--color-primary)]">Reading pages...</p>
               </motion.div>
             ) : file ? (
-              <motion.div key="file" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-4 w-full">
-                <div className="w-14 h-14 bg-[var(--color-secondary)]/20 rounded-xl flex items-center justify-center shrink-0">
-                  <FileText className="text-[var(--color-primary)]" size={32} />
+              <motion.div key="file" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-6 w-full">
+                <div className="w-20 h-20 bg-[var(--color-primary)]/10 rounded-3xl flex items-center justify-center shrink-0 shadow-inner">
+                  <FileText className="text-[var(--color-primary)]" size={40} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-[var(--color-text-dark)] truncate">{file.name}</p>
-                  <p className="text-xs text-[var(--color-text-dark)] opacity-60">
+                  <p className="text-xl font-black text-[var(--color-text-dark)] truncate mb-1">{file.name}</p>
+                  <p className="text-xs font-bold text-[var(--color-text-dark)]/50 uppercase tracking-widest">
                     {(file.size / 1024 / 1024).toFixed(2)} MB • {pageCount} {pageCount === 1 ? 'Page' : 'Pages'}
                   </p>
                 </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setFile(null); setPageCount(0); }}
-                  className="p-2 hover:bg-red-100 rounded-full transition-colors"
-                >
-                  <X className="text-red-500" size={20} />
+                <button onClick={(e) => { e.stopPropagation(); setFile(null); setPageCount(0); }} className="w-12 h-12 flex items-center justify-center bg-red-100 rounded-2xl text-red-600 hover:bg-red-200 transition-colors">
+                  <X size={24} />
                 </button>
               </motion.div>
             ) : (
-              <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-3 text-center">
-                <div className="w-16 h-16 bg-white/40 rounded-full flex items-center justify-center shadow-inner">
-                  <UploadCloud className="text-[var(--color-primary)]" size={32} />
+              <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
+                <div className="w-20 h-20 bg-white/60 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                  <UploadCloud className="text-[var(--color-primary)]" size={40} />
                 </div>
-                <div>
-                  <p className="font-bold text-[var(--color-text-dark)]">Click or drag file here</p>
-                  <p className="text-xs text-[var(--color-text-dark)] opacity-50">PDF, JPG, PNG (Max 50MB)</p>
-                </div>
+                <p className="text-xl font-black text-[var(--color-text-dark)] mb-1">Click or Drag to Upload</p>
+                <p className="text-xs font-bold text-[var(--color-text-dark)]/40 uppercase tracking-widest">PDF, JPG, PNG (Max 50MB)</p>
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
 
-        {fileError && (
-          <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-100">
-            <AlertCircle size={16} />
-            <p className="text-xs font-medium">{fileError}</p>
-          </motion.div>
-        )}
+        {fileError && <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-2xl border border-red-100 text-sm font-bold"><AlertCircle size={20} />{fileError}</div>}
 
-        {/* Print Settings Card */}
-        <div className="glass-card p-6 space-y-6">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--color-primary)] opacity-80">Print Options</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Copies */}
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-[var(--color-text-dark)]/60">Number of Copies</label>
-              <div className="flex items-center gap-4 bg-white/40 p-2 rounded-xl border border-white/50">
-                <button 
-                  onClick={() => setCopyCount(Math.max(1, copyCount - 1))}
-                  className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm hover:scale-105 active:scale-95 transition-all"
-                >
-                  <Minus size={18} />
-                </button>
-                <span className="flex-1 text-center font-bold text-xl">{copyCount}</span>
-                <button 
-                  onClick={() => setCopyCount(Math.min(50, copyCount + 1))}
-                  className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm hover:scale-105 active:scale-95 transition-all"
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
-            </div>
+        {/* Options Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="glass-card p-6 space-y-6">
+             <div className="flex items-center gap-3 border-b border-white/40 pb-4">
+                <Palette size={20} className="text-[var(--color-primary)]" />
+                <h3 className="text-sm font-black uppercase tracking-widest">Appearance</h3>
+             </div>
+             
+             {/* Color Toggle */}
+             <div className="flex p-1 bg-white/40 rounded-2xl border border-white/60">
+                <button onClick={() => setIsColor(false)} className={`flex-1 py-3 text-xs font-black rounded-xl transition-all ${!isColor ? 'bg-[var(--color-primary)] text-white shadow-lg' : 'text-[var(--color-text-dark)]/60 hover:bg-white/40'}`}>B&W (৳2)</button>
+                <button onClick={() => setIsColor(true)} className={`flex-1 py-3 text-xs font-black rounded-xl transition-all ${isColor ? 'bg-[var(--color-accent)] text-white shadow-lg' : 'text-[var(--color-text-dark)]/60 hover:bg-white/40'}`}>COLOR (৳5)</button>
+             </div>
 
-            {/* Color Mode */}
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-[var(--color-text-dark)]/60">Color Mode</label>
-              <div className="flex p-1 bg-white/40 rounded-xl border border-white/50">
-                <button
-                  onClick={() => setIsColor(false)}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${!isColor ? 'bg-[var(--color-primary)] text-white shadow-md' : 'text-[var(--color-text-dark)]/60 hover:bg-white/40'}`}
-                >
-                  B&W (৳2)
-                </button>
-                <button
-                  onClick={() => setIsColor(true)}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${isColor ? 'bg-[var(--color-accent)] text-white shadow-md' : 'text-[var(--color-text-dark)]/60 hover:bg-white/40'}`}
-                >
-                  Color (৳5)
-                </button>
-              </div>
-            </div>
-
-            {/* Duplex Printing */}
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-[var(--color-text-dark)]/60">Sides</label>
-              <div className="flex items-center justify-between bg-white/40 p-3 rounded-xl border border-white/50">
-                <div className="flex items-center gap-2">
-                  <Layers size={18} className="text-[var(--color-primary)]" />
-                  <span className="text-sm font-bold">{isDuplex ? 'Double Sided' : 'Single Sided'}</span>
-                </div>
-                <button
-                  onClick={() => setIsDuplex(!isDuplex)}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${isDuplex ? 'bg-[var(--color-primary)]' : 'bg-gray-300'}`}
-                >
-                  <motion.div
-                    animate={{ x: isDuplex ? 24 : 2 }}
-                    className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
-                  />
-                </button>
-              </div>
-            </div>
-
-            {/* Orientation */}
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-[var(--color-text-dark)]/60">Orientation</label>
-              <div className="flex items-center justify-between bg-white/40 p-3 rounded-xl border border-white/50">
-                <div className="flex items-center gap-2">
+             {/* Orientation Toggle */}
+             <div className="flex items-center justify-between glass-panel p-4">
+                <div className="flex items-center gap-3">
                   <RotateCcw size={18} className="text-[var(--color-primary)]" />
-                  <span className="text-sm font-bold">{orientation === 'PORTRAIT' ? 'Portrait' : 'Landscape'}</span>
+                  <span className="text-sm font-bold uppercase tracking-tight">{orientation}</span>
                 </div>
-                <button
-                  onClick={() => setOrientation(orientation === 'PORTRAIT' ? 'LANDSCAPE' : 'PORTRAIT')}
-                  className="p-2 hover:bg-white rounded-lg transition-all"
-                >
-                  <RotateCcw size={16} className={orientation === 'LANDSCAPE' ? 'rotate-90 transition-transform' : 'transition-transform'} />
-                </button>
-              </div>
-            </div>
+                <button onClick={() => setOrientation(orientation === 'PORTRAIT' ? 'LANDSCAPE' : 'PORTRAIT')} className="w-10 h-10 flex items-center justify-center bg-white/80 rounded-xl hover:rotate-90 transition-all duration-500 shadow-sm"><RotateCcw size={18} /></button>
+             </div>
           </div>
-        </div>
 
-        {/* Contact Info Card */}
-        <div className="glass-card p-6 space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--color-primary)] opacity-80">Contact Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="email" placeholder="Email Address" value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 bg-white/50 rounded-xl border border-white/60 focus:border-[var(--color-primary)] outline-none text-sm transition-all"
-            />
-            <input
-              type="tel" placeholder="Phone Number" value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-3 bg-white/50 rounded-xl border border-white/60 focus:border-[var(--color-primary)] outline-none text-sm transition-all"
-            />
-          </div>
-        </div>
+          <div className="glass-card p-6 space-y-6">
+             <div className="flex items-center gap-3 border-b border-white/40 pb-4">
+                <Layout size={20} className="text-[var(--color-primary)]" />
+                <h3 className="text-sm font-black uppercase tracking-widest">Layout</h3>
+             </div>
 
-        {/* Price & Action Card */}
-        <div className="glass-card p-6 bg-gradient-to-br from-white/40 to-white/10 relative overflow-hidden">
-          <div className="flex items-center justify-between relative z-10">
-            <div>
-              <p className="text-xs font-bold text-[var(--color-primary)] opacity-60 uppercase tracking-tighter">Total Price</p>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-[var(--color-primary)]">৳{total}</span>
-                <span className="text-xs font-bold opacity-40">BDT</span>
-              </div>
-              {isDuplex && (
-                <div className="flex items-center gap-1.5 mt-1 text-[var(--color-primary)]">
-                  <Info size={12} />
-                  <p className="text-[10px] font-bold">Duplex printing saves paper!</p>
+             {/* Copy Stepper */}
+             <div className="flex items-center justify-between glass-panel p-2">
+                <button onClick={() => setCopyCount(Math.max(1, copyCount - 1))} className="w-12 h-12 flex items-center justify-center bg-white/80 rounded-xl shadow-sm hover:scale-105 transition-transform"><Minus size={20} /></button>
+                <div className="text-center">
+                  <p className="text-xs font-black text-[var(--color-primary)]/40 uppercase">Copies</p>
+                  <p className="text-2xl font-black">{copyCount}</p>
                 </div>
-              )}
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-              onClick={handleSubmit}
-              disabled={!file || uploading || pageCount === 0}
-              className="px-8 py-4 bg-[var(--color-accent)] text-white font-black rounded-2xl shadow-xl shadow-[var(--color-accent)]/30 disabled:opacity-50 disabled:grayscale transition-all flex items-center gap-2"
-            >
-              {uploading ? <Loader2 className="animate-spin" size={20} /> : <><Printer size={20} /> Print Now <ArrowRight size={20} /></>}
-            </motion.button>
+                <button onClick={() => setCopyCount(Math.min(50, copyCount + 1))} className="w-12 h-12 flex items-center justify-center bg-white/80 rounded-xl shadow-sm hover:scale-105 transition-transform"><Plus size={20} /></button>
+             </div>
+
+             {/* Duplex Toggle */}
+             <div className="flex items-center justify-between glass-panel p-4">
+                <div className="flex items-center gap-3">
+                  <Layers size={18} className="text-[var(--color-primary)]" />
+                  <span className="text-sm font-bold uppercase tracking-tight">{isDuplex ? 'Double Sided' : 'Single Sided'}</span>
+                </div>
+                <button onClick={() => setIsDuplex(!isDuplex)} className={`w-12 h-6 rounded-full transition-colors relative ${isDuplex ? 'bg-[var(--color-primary)]' : 'bg-white/60'}`}><motion.div animate={{ x: isDuplex ? 26 : 2 }} className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-md" /></button>
+             </div>
           </div>
-          
-          {/* Background Decoration */}
-          <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-[var(--color-accent)]/5 rounded-full blur-3xl" />
         </div>
 
-        {uploadError && (
-          <p className="text-center text-xs font-bold text-red-600 bg-red-50 py-2 rounded-lg">{uploadError}</p>
-        )}
+        {/* User Info */}
+        <div className="glass-card p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-1">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" size={18} />
+                <input type="email" placeholder="e.g. john@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field !pl-12" />
+              </div>
+           </div>
+           <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-1">Phone Number</label>
+              <div className="relative">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" size={18} />
+                <input type="tel" placeholder="e.g. 01700000000" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field !pl-12" />
+              </div>
+           </div>
+        </div>
+
+        {/* Action Bar */}
+        <div className="glass-card p-8 bg-gradient-to-r from-white/60 to-white/20">
+           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="text-center md:text-left">
+                 <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-1">Estimated Total</p>
+                 <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-black text-[var(--color-primary)] tracking-tighter">৳{total}</span>
+                    <span className="text-sm font-black opacity-30 uppercase tracking-widest">BDT</span>
+                 </div>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                onClick={handleSubmit} disabled={!file || uploading || pageCount === 0}
+                className="btn-primary !py-6 !px-12 text-xl w-full md:w-auto shadow-2xl shadow-orange-500/30"
+              >
+                {uploading ? <Loader2 className="animate-spin" size={24} /> : <><Printer size={24} /> Pay & Print <ArrowRight size={24} /></>}
+              </motion.button>
+           </div>
+           {uploadError && <p className="mt-6 text-center text-xs font-black text-red-600 bg-red-50 py-3 rounded-xl">{uploadError}</p>}
+        </div>
       </div>
     </motion.div>
   );

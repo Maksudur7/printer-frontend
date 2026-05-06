@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Printer, Plus, Search, RefreshCw, Signal, SignalLow, AlertTriangle, 
-  Settings2, Activity, MapPin, Battery, Cpu, Loader2, X, Download, QrCode
+  Settings2, Activity, MapPin, Battery, Cpu, Loader2, X, Download, QrCode, Trash2
 } from 'lucide-react';
 import { apiClient } from '@/lib/apiClient';
 
@@ -65,6 +65,28 @@ export default function KiosksPage() {
       alert(err.response?.data?.message || 'Registration failed');
     } finally {
       setRegLoading(false);
+    }
+  };
+
+  const handleDelete = async (deviceId: string) => {
+    if (!confirm('Are you sure you want to delete this kiosk? This action cannot be undone.')) return;
+    
+    try {
+      await apiClient.post(`/v1/kiosk/admin/delete/${deviceId}`);
+      fetchKiosks();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Delete failed');
+    }
+  };
+
+  const handleDelete = async (deviceId: string) => {
+    if (!confirm('Are you sure you want to delete this kiosk? This action cannot be undone.')) return;
+    
+    try {
+      await apiClient.post(`/v1/kiosk/admin/delete/${deviceId}`);
+      fetchKiosks();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Delete failed');
     }
   };
 

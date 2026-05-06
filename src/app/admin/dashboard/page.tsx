@@ -57,23 +57,23 @@ export default function AdminDashboardPage() {
   const statCards = [
     { 
       label: 'Total Revenue', 
-      value: `৳${data?.stats.totalRevenue.toLocaleString() || '0'}`, 
+      value: `৳${data?.stats?.totalRevenue?.toLocaleString() || '0'}`, 
       trend: 'Lifetime', 
       isUp: true, 
       icon: CreditCard, color: 'bg-blue-500' 
     },
     { 
       label: 'Fleet Status', 
-      value: `${data?.stats.onlineCount || 0}/${data?.stats.totalDevices || 0}`, 
+      value: `${data?.stats?.onlineCount || 0}/${data?.stats?.totalDevices || 0}`, 
       trend: 'Devices Online', 
-      isUp: (data?.stats.onlineCount || 0) === (data?.stats.totalDevices || 0), 
+      isUp: (data?.stats?.onlineCount || 0) === (data?.stats?.totalDevices || 0), 
       icon: Printer, color: 'bg-[var(--color-primary)]' 
     },
     { 
       label: 'System Alerts', 
-      value: data?.stats.errorCount || '0', 
-      trend: data?.stats.errorCount === 0 ? 'Healthy' : 'Needs Attention', 
-      isUp: data?.stats.errorCount === 0, 
+      value: data?.stats?.errorCount || '0', 
+      trend: data?.stats?.errorCount === 0 ? 'Healthy' : 'Needs Attention', 
+      isUp: data?.stats?.errorCount === 0, 
       icon: ShieldAlert, color: 'bg-orange-500' 
     },
     { 
@@ -208,12 +208,12 @@ export default function AdminDashboardPage() {
               <div className="pt-4">
                  <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-40 mb-4">Device Health Distribution</p>
                  <div className="flex gap-1 h-3 rounded-full overflow-hidden">
-                    <div className="bg-green-500 h-full" style={{ width: `${(data?.stats.onlineCount || 0) / (data?.stats.totalDevices || 1) * 100}%` }} />
-                    <div className="bg-orange-500 h-full" style={{ width: `${(data?.stats.errorCount || 0) / (data?.stats.totalDevices || 1) * 100}%` }} />
+                    <div className="bg-green-500 h-full" style={{ width: `${(data?.stats?.onlineCount || 0) / (data?.stats?.totalDevices || 1) * 100}%` }} />
+                    <div className="bg-orange-500 h-full" style={{ width: `${(data?.stats?.errorCount || 0) / (data?.stats?.totalDevices || 1) * 100}%` }} />
                  </div>
                  <div className="flex justify-between mt-3 text-[8px] font-black uppercase opacity-60">
-                    <span>{data?.stats.onlineCount} Online</span>
-                    <span>{data?.stats.errorCount} Issues</span>
+                    <span>{data?.stats?.onlineCount || 0} Online</span>
+                    <span>{data?.stats?.errorCount || 0} Issues</span>
                  </div>
               </div>
            </div>

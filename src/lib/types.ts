@@ -2,8 +2,9 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'USER' | 'ADMIN';
+  role: 'USER' | 'ADMIN' | 'SUPER_ADMIN';
   avatar?: string;
+  isApproved?: boolean;
 }
 
 // ─── Kiosk ───────────────────────────────────────────────

@@ -19,7 +19,7 @@ const BW_RATE = 2;
 function UploadContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const deviceId = searchParams.get('kiosk') ?? '';
+  const deviceId = searchParams.get('kiosk') || searchParams.get('deviceId') || '';
 
   const store = useOrderStore();
 

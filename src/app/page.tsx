@@ -13,7 +13,7 @@ import { useOrderStore } from '@/store/useOrderStore';
 function LandingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const deviceId = searchParams.get('kiosk');
+  const deviceId = searchParams.get('kiosk') || searchParams.get('deviceId');
 
   const [kiosk, setKiosk] = useState<Kiosk | null>(null);
   const [loading, setLoading] = useState(false);

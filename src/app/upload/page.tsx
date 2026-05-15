@@ -23,6 +23,12 @@ function UploadContent() {
 
   const store = useOrderStore();
 
+  useEffect(() => {
+    if (deviceId) {
+      store.setKioskId(deviceId);
+    }
+  }, [deviceId, store]);
+
   const [file, setFile] = useState<File | null>(null);
   const [pageCount, setPageCount] = useState(0);
   const [copyCount, setCopyCount] = useState(1);

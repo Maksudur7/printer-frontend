@@ -79,14 +79,24 @@ export default function KiosksPage() {
     }
   };
 
-  const downloadQR = (qrDataUrl: string, deviceId: string) => {
+  const downloadQR = async (qrDataUrl: string, deviceId: string) => {
     if (!qrDataUrl) return;
-    const link = document.createElement('a');
-    link.href = qrDataUrl;
-    link.download = `kiosk-${deviceId}-qr.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const response = await fetch(qrDataUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `kiosk-${deviceId}-qr.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to download QR code:', err);
+      // Fallback: open in new tab if direct download fails
+      window.open(qrDataUrl, '_blank');
+    }
   };
 
   const filteredKiosks = kiosks.filter(k => 

@@ -23,11 +23,13 @@ function UploadContent() {
 
   const store = useOrderStore();
 
+  const setKioskId = store.setKioskId;
+
   useEffect(() => {
     if (deviceId) {
-      store.setKioskId(deviceId);
+      setKioskId(deviceId);
     }
-  }, [deviceId, store]);
+  }, [deviceId, setKioskId]);
 
   const [file, setFile] = useState<File | null>(null);
   const [pageCount, setPageCount] = useState(0);

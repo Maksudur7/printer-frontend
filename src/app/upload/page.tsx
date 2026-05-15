@@ -106,7 +106,7 @@ function UploadContent() {
       fd.append('userEmail', email);
       fd.append('userPhone', phone);
 
-      const res = await apiClient.post('/v1/order', fd, {
+      const res = await apiClient.post('/v1/order/upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

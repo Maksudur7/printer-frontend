@@ -52,6 +52,10 @@ function CheckoutContent() {
 
     try {
       if (selected === 'CASH') {
+        // Simulation: Mark payment as completed for CASH
+        await apiClient.patch(`/v1/order/${orderId}`, {
+          paymentStatus: 'COMPLETED',
+        });
         router.push(`/track?orderId=${orderId}`);
         return;
       }
@@ -64,6 +68,10 @@ function CheckoutContent() {
       if (res.data.paymentUrl) {
         window.location.href = res.data.paymentUrl;
       } else {
+        // Fallback for simulation or methods without URL
+        await apiClient.patch(`/v1/order/${orderId}`, {
+          paymentStatus: 'COMPLETED',
+        });
         router.push(`/track?orderId=${orderId}`);
       }
     } catch (e: unknown) {

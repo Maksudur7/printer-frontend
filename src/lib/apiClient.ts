@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://printer-project-two.vercel.app',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://printer-project-production.up.railway.app',
   timeout: 30000,
   headers: { 'Content-Type': 'application/json' },
 });

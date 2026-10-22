@@ -7,11 +7,8 @@ const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-console.log('API Base URL:', apiClient.defaults.baseURL);
-
 // Request interceptor for auth token
 apiClient.interceptors.request.use((config) => {
-  console.log(`Making request to: ${config.baseURL || ''}${config.url}`);
   const token = useAuthStore.getState().token;
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;

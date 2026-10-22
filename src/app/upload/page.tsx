@@ -13,8 +13,9 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { useOrderStore } from '@/store/useOrderStore';
 
 const ACCEPTED = ['.pdf', '.jpg', '.jpeg', '.png'];
-const COLOR_RATE = 5;
-const BW_RATE = 2;
+// Default prices — will be overridden by server config
+const DEFAULT_BW_RATE = 2;
+const DEFAULT_COLOR_RATE = 5;
 
 function UploadContent() {
   const searchParams = useSearchParams();
@@ -49,8 +50,21 @@ function UploadContent() {
   
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [bwRate, setBwRate] = useState(DEFAULT_BW_RATE);
+  const [colorRate, setColorRate] = useState(DEFAULT_COLOR_RATE);
+
+  // Fetch live pricing from server
+  useEffect(() => {
+    apiClient.get('/v1/config')
+      .then((res) => {
+        if (res.data?.bwPrice) setBwRate(res.data.bwPrice);
+        if (res.data?.colorPrice) setColorRate(res.data.colorPrice);
+      })
+      .catch(() => { /* use defaults silently */ });
+  }, []);
+
   // Price Calculation
-  const total = pageCount * copyCount * (isColor ? COLOR_RATE : BW_RATE);
+  const total = pageCount * copyCount * (isColor ? colorRate : bwRate);
 
   /* ── Auto Page Detection ────────────────────────────── */
   const processFile = useCallback(async (f: File) => {
@@ -225,8 +239,8 @@ function UploadContent() {
              
              {/* Color Toggle */}
              <div className="flex p-1 bg-white/40 rounded-2xl border border-white/60">
-                <button onClick={() => setIsColor(false)} className={`flex-1 py-3 text-xs font-black rounded-xl transition-all ${!isColor ? 'bg-[var(--color-primary)] text-white shadow-lg' : 'text-[var(--color-text-dark)]/60 hover:bg-white/40'}`}>B&W (৳2)</button>
-                <button onClick={() => setIsColor(true)} className={`flex-1 py-3 text-xs font-black rounded-xl transition-all ${isColor ? 'bg-[var(--color-accent)] text-white shadow-lg' : 'text-[var(--color-text-dark)]/60 hover:bg-white/40'}`}>COLOR (৳5)</button>
+                <button onClick={() => setIsColor(false)} className={`flex-1 py-3 text-xs font-black rounded-xl transition-all ${!isColor ? 'bg-[var(--color-primary)] text-white shadow-lg' : 'text-[var(--color-text-dark)]/60 hover:bg-white/40'}`}>B&W (৳{bwRate})</button>
+                <button onClick={() => setIsColor(true)} className={`flex-1 py-3 text-xs font-black rounded-xl transition-all ${isColor ? 'bg-[var(--color-accent)] text-white shadow-lg' : 'text-[var(--color-text-dark)]/60 hover:bg-white/40'}`}>COLOR (৳{colorRate})</button>
              </div>
 
              {/* Orientation Toggle */}

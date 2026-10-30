@@ -45,8 +45,8 @@ function UploadContent() {
   const [bwRate, setBwRate] = useState(DEFAULT_BW_RATE);
   const [colorRate, setColorRate] = useState(DEFAULT_COLOR_RATE);
 
-  // 10-Minute Session Countdown Timer
-  const initialDuration = parseInt(searchParams.get('time') || '600', 10);
+  // 5-Minute Session Countdown Timer
+  const initialDuration = parseInt(searchParams.get('time') || '300', 10);
   const [timeLeft, setTimeLeft] = useState<number>(initialDuration);
   const [isExpired, setIsExpired] = useState(false);
 
@@ -169,7 +169,7 @@ function UploadContent() {
 
   return (
     <div className="w-full max-w-3xl mx-auto px-6 py-12">
-      {/* ⏱️ 10-Minute Session Banner */}
+      {/* ⏱️ 5-Minute Session Banner */}
       <div className="mb-8 p-4 glass-card border border-white/60 bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-transparent rounded-2xl flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <div className={`w-3 h-3 rounded-full ${isExpired ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'}`} />
@@ -178,12 +178,12 @@ function UploadContent() {
               {isExpired ? '⚠️ সেশনের সময় শেষ (Session Expired)' : '🟢 ইন্টারনেট প্রিন্ট সেশন সক্রিয়'}
             </p>
             <p className="text-[10px] font-bold opacity-60">
-              {isExpired ? 'নতুন সেশনের জন্য QR কোড আবার স্ক্যান করুন' : 'নির্ধারিত ১০ মিনিটের ভেতরে প্রিন্ট অর্ডার সম্পন্ন করুন'}
+              {isExpired ? 'নতুন সেশনের জন্য QR কোড আবার স্ক্যান করুন' : 'নির্ধারিত ৯ মিনিটের ভেতরে প্রিন্ট অর্ডার সম্পন্ন করুন'}
             </p>
           </div>
         </div>
         <div className={`px-4 py-1.5 rounded-full text-xs font-mono font-black tracking-widest shadow-sm flex items-center gap-1.5 ${
-          isExpired ? 'bg-red-500 text-white' : timeLeft < 120 ? 'bg-amber-500 text-white animate-pulse' : 'bg-emerald-600 text-white'
+          isExpired ? 'bg-red-500 text-white' : timeLeft < 60 ? 'bg-amber-500 text-white animate-pulse' : 'bg-emerald-600 text-white'
         }`}>
           <span>⏱️</span>
           <span>{formatTimer(timeLeft)}</span>

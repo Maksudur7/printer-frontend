@@ -11,6 +11,7 @@ import {
 import { apiClient } from '@/lib/apiClient';
 import type { Order, PrintStatus } from '@/lib/types';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useOrderStore } from '@/store/useOrderStore';
 
 // ─── Step definitions ────────────────────────────────────
 interface Step {
@@ -39,6 +40,17 @@ function TrackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get('orderId') ?? '';
+  const { kioskId, reset } = useOrderStore();
+
+  const handlePrintAnother = () => {
+    const targetKiosk = order?.kioskId || kioskId;
+    reset();
+    if (targetKiosk) {
+      router.replace(`/upload?kiosk=${targetKiosk}`);
+    } else {
+      router.replace('/');
+    }
+  };
 
   const { data: order, isLoading, isError, error } = useQuery<Order>({
     queryKey: ['order', orderId],
@@ -63,7 +75,7 @@ function TrackContent() {
           </div>
           <h2 className="text-2xl font-black uppercase tracking-tighter mb-2">No Order Found</h2>
           <p className="text-sm font-bold opacity-50 mb-10 leading-relaxed">It seems you don't have an active print session right now.</p>
-          <button className="btn-primary w-full py-5 text-lg" onClick={() => router.replace('/')}>Go to Home</button>
+          <button className="btn-primary w-full py-5 text-lg flex items-center justify-center gap-2" onClick={handlePrintAnother}><Printer size={20} /> Go to Upload</button>
         </motion.div>
       </div>
     );
@@ -134,8 +146,8 @@ function TrackContent() {
                 </motion.div>
                 <h2 className="text-4xl font-black mb-4 text-green-700 uppercase tracking-tighter leading-none">Ready to Collect!</h2>
                 <p className="text-lg text-green-700/80 font-bold mb-12 max-w-sm mx-auto">Success! Your document is waiting for you in the printer tray.</p>
-                <button onClick={() => router.replace('/')} className="btn-primary w-full py-7 text-2xl !bg-green-600 !shadow-green-600/20">
-                  Back to Home
+                <button onClick={handlePrintAnother} className="btn-primary w-full py-7 text-2xl !bg-green-600 !shadow-green-600/20 flex items-center justify-center gap-3">
+                  <Printer size={28} /> Print Another Document (আরেকটি প্রিন্ট করুন)
                 </button>
               </motion.div>
             ) : (

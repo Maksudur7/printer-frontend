@@ -45,21 +45,52 @@ function UploadContent() {
   const [bwRate, setBwRate] = useState(DEFAULT_BW_RATE);
   const [colorRate, setColorRate] = useState(DEFAULT_COLOR_RATE);
 
-  // 5-Minute Session Countdown Timer
+  // Persistent 5-Minute Session Countdown Timer (Survives Browser Refresh)
   const initialDuration = parseInt(searchParams.get('time') || '300', 10);
   const [timeLeft, setTimeLeft] = useState<number>(initialDuration);
   const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
-    if (timeLeft <= 0) { setIsExpired(true); return; }
+    if (typeof window === 'undefined') return;
+
+    const storageKey = `sp_session_expiry_${deviceId || 'default'}`;
+    const now = Date.now();
+    let expiryTimestamp: number;
+
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      // If stored within the last 15 minutes, respect the real clock expiry
+      if (!isNaN(parsed) && parsed > now - 900 * 1000 && parsed < now + 900 * 1000) {
+        expiryTimestamp = parsed;
+      } else {
+        expiryTimestamp = now + initialDuration * 1000;
+        localStorage.setItem(storageKey, String(expiryTimestamp));
+      }
+    } else {
+      expiryTimestamp = now + initialDuration * 1000;
+      localStorage.setItem(storageKey, String(expiryTimestamp));
+    }
+
+    const calcRemaining = () => Math.max(0, Math.floor((expiryTimestamp - Date.now()) / 1000));
+    const initialRem = calcRemaining();
+    setTimeLeft(initialRem);
+    if (initialRem <= 0) {
+      setIsExpired(true);
+      return;
+    }
+
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) { clearInterval(timer); setIsExpired(true); return 0; }
-        return prev - 1;
-      });
+      const rem = calcRemaining();
+      setTimeLeft(rem);
+      if (rem <= 0) {
+        setIsExpired(true);
+        clearInterval(timer);
+      }
     }, 1000);
+
     return () => clearInterval(timer);
-  }, []);
+  }, [deviceId, initialDuration]);
 
   const formatTimer = (sec: number) => {
     const m = Math.floor(sec / 60);

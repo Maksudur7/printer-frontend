@@ -92,8 +92,11 @@ function CheckoutContent() {
             Order Expired
           </h2>
           <p className="text-sm text-[var(--color-text-dark)] opacity-60 mb-8">{error}</p>
-          <button className="btn-secondary w-full py-4" onClick={() => router.replace('/')}>
-            Return Home
+          <button className="btn-secondary w-full py-4" onClick={() => {
+            const kId = useOrderStore.getState().kioskId || order?.kioskId;
+            router.replace(kId ? `/upload?kiosk=${kId}` : '/');
+          }}>
+            Return to Upload
           </button>
         </div>
       </div>

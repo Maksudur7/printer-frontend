@@ -25,10 +25,6 @@ function UploadContent() {
   const store = useOrderStore();
   const setKioskId = store.setKioskId;
 
-  // Hydration safety: wait for client mount to avoid SSR/CSR mismatch with zustand persist
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-
   useEffect(() => {
     if (deviceId) {
       setKioskId(deviceId);
@@ -196,7 +192,7 @@ function UploadContent() {
   if (!deviceId) {
     return (
       <div className="flex-1 flex items-center justify-center w-full px-6 py-16">
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-10 text-center max-w-sm w-full relative overflow-hidden">
+        <motion.div initial={{ opacity: 1, scale: 1 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-10 text-center max-w-sm w-full relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)]" />
           <div className="w-24 h-24 rounded-[2rem] bg-[var(--color-accent)]/10 flex items-center justify-center mx-auto mb-6 relative">
             <QrCode size={48} className="text-[var(--color-accent)]" />
@@ -214,11 +210,8 @@ function UploadContent() {
     );
   }
 
-  // Show nothing until mounted (prevents hydration flash on mobile)
-  if (!mounted) return null;
-
   return (
-    <motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-3xl mx-auto px-6 py-12">
+    <motion.div initial={{ opacity: 1 }} animate={{ opacity: 1 }} className="w-full max-w-3xl mx-auto px-6 py-12">
       {/* ⏱️ 10-Minute Live Hotspot Session Banner */}
       <div className="mb-8 p-4 glass-card border border-white/60 bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-transparent rounded-2xl flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
@@ -261,12 +254,12 @@ function UploadContent() {
           <input ref={inputRef} type="file" className="hidden" accept={ACCEPTED.join(',')} onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f); }} />
           <AnimatePresence mode="wait">
             {isParsing ? (
-              <motion.div key="parsing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-4">
+              <motion.div key="parsing" initial={{ opacity: 1 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-4">
                 <Loader2 className="animate-spin text-[var(--color-primary)]" size={48} />
                 <p className="font-black uppercase tracking-widest text-xs text-[var(--color-primary)]">Reading pages...</p>
               </motion.div>
             ) : file ? (
-              <motion.div key="file" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-6 w-full">
+              <motion.div key="file" initial={{ opacity: 1, scale: 1 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-6 w-full">
                 <div className="w-20 h-20 bg-[var(--color-primary)]/10 rounded-3xl flex items-center justify-center shrink-0 shadow-inner">
                   <FileText className="text-[var(--color-primary)]" size={40} />
                 </div>
@@ -281,7 +274,7 @@ function UploadContent() {
                 </button>
               </motion.div>
             ) : (
-              <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
+              <motion.div key="empty" initial={{ opacity: 1 }} animate={{ opacity: 1 }} className="text-center">
                 <div className="w-20 h-20 bg-white/60 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
                   <UploadCloud className="text-[var(--color-primary)]" size={40} />
                 </div>

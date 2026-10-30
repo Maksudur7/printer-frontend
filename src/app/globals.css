@@ -9,9 +9,6 @@
   --color-white: #FFFFFF;
   --color-surface: rgba(255, 255, 255, 0.4);
 
-  --font-inter: var(--font-inter-var), 'Inter', system-ui, sans-serif;
-  --font-outfit: var(--font-outfit-var), 'Outfit', system-ui, sans-serif;
-
   --shadow-glass: 0 8px 32px 0 rgba(70, 132, 50, 0.15);
 }
 
@@ -27,7 +24,13 @@ body {
 body {
   background: linear-gradient(135deg, var(--color-background) 0%, #FDF6B2 100%);
   color: var(--color-text-dark);
-  font-family: var(--font-inter);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--color-primary);
+  font-weight: 800;
 }
 
 /* Glassmorphism utility */
@@ -37,14 +40,6 @@ body {
 
 .glass-panel {
   @apply backdrop-blur-md bg-white/20 border border-white/30 rounded-2xl;
-}
-
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-outfit);
-  color: var(--color-primary);
-  font-weight: 800;
-  @apply tracking-tight;
 }
 
 /* Buttons */

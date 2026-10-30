@@ -17,6 +17,9 @@ interface Kiosk {
   inkLevel: number;
   lastHeartbeat: string;
   qrCodeUrl: string; // Backend generated QR code
+  connectionType?: string;
+  wifiSsid?: string;
+  localIp?: string;
 }
 
 export default function KiosksPage() {
@@ -174,7 +177,18 @@ export default function KiosksPage() {
                     </div>
                     <div>
                        <h3 className="text-xl font-black uppercase tracking-tighter leading-none mb-1">{kiosk.name || 'Device'}</h3>
-                       <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{kiosk.deviceId}</p>
+                       <div className="flex items-center gap-2">
+                          <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{kiosk.deviceId}</p>
+                          {kiosk.wifiSsid ? (
+                             <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                📶 {kiosk.wifiSsid}
+                             </span>
+                          ) : kiosk.connectionType === 'ETHERNET' ? (
+                             <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                                🌐 LAN
+                             </span>
+                          ) : null}
+                       </div>
                     </div>
                  </div>
                  <div className={`px-4 py-1.5 rounded-full flex items-center gap-2 text-[8px] font-black uppercase tracking-widest text-white ${getStatusColor(kiosk.status)} shadow-lg`}>

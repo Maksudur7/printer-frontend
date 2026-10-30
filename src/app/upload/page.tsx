@@ -53,6 +53,36 @@ function UploadContent() {
   const [bwRate, setBwRate] = useState(DEFAULT_BW_RATE);
   const [colorRate, setColorRate] = useState(DEFAULT_COLOR_RATE);
 
+  // 10-Minute Hotspot Session Countdown Timer
+  const sessionToken = searchParams.get('session') || '';
+  const initialDuration = parseInt(searchParams.get('time') || '600', 10);
+  const [timeLeft, setTimeLeft] = useState<number>(initialDuration);
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      setIsExpired(true);
+      return;
+    }
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setIsExpired(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTimer = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
   // Fetch live pricing from server
   useEffect(() => {
     apiClient.get('/v1/config')
@@ -110,6 +140,10 @@ function UploadContent() {
 
   /* ── Submit ──────────────────────────────────────────── */
   const handleSubmit = async () => {
+    if (isExpired) {
+      setUploadError('⚠️ আপনার সেশনের সময় শেষ! দয়া করে দোকানে লাগানো QR কোড আবার স্ক্যান করুন।');
+      return;
+    }
     if (!file) { setFileError('Please select a file to upload.'); return; }
     if (pageCount === 0) { setFileError('Wait for page count detection.'); return; }
     if (!email || !phone) { setUploadError('Email and phone are required.'); return; }
@@ -179,6 +213,31 @@ function UploadContent() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-3xl mx-auto px-6 py-12">
+      {/* ⏱️ 10-Minute Live Hotspot Session Banner */}
+      <div className="mb-8 p-4 glass-card border border-white/60 bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-transparent rounded-2xl flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className={`w-3 h-3 rounded-full ${isExpired ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'}`} />
+          <div>
+            <p className="text-xs font-black uppercase tracking-wider text-[var(--color-text-dark)]">
+              {isExpired ? '⚠️ সেশনের সময় শেষ (Session Expired)' : '🟢 ইন্টারনেট প্রিন্ট সেশন সক্রিয়'}
+            </p>
+            <p className="text-[10px] font-bold opacity-60">
+              {isExpired ? 'নতুন সেশনের জন্য কাউন্টারের QR কোড আবার স্ক্যান করুন' : 'নির্ধারিত ১০ মিনিটের ভেতরে প্রিন্ট অর্ডার সম্পন্ন করুন'}
+            </p>
+          </div>
+        </div>
+        <div className={`px-4 py-1.5 rounded-full text-xs font-mono font-black tracking-widest shadow-sm flex items-center gap-1.5 ${
+          isExpired 
+            ? 'bg-red-500 text-white' 
+            : timeLeft < 120 
+              ? 'bg-amber-500 text-white animate-pulse' 
+              : 'bg-emerald-600 text-white'
+        }`}>
+          <span>⏱️</span>
+          <span>{formatTimer(timeLeft)}</span>
+        </div>
+      </div>
+
       <div className="text-center mb-10">
         <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">Configure <span className="text-[var(--color-accent)]">Print</span></h1>
         <p className="text-sm font-bold opacity-60">Complete your details to start the printing process.</p>

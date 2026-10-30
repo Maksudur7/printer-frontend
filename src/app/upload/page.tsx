@@ -23,8 +23,11 @@ function UploadContent() {
   const deviceId = searchParams.get('kiosk') || searchParams.get('deviceId') || '';
 
   const store = useOrderStore();
-
   const setKioskId = store.setKioskId;
+
+  // Hydration safety: wait for client mount to avoid SSR/CSR mismatch with zustand persist
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (deviceId) {
@@ -211,8 +214,11 @@ function UploadContent() {
     );
   }
 
+  // Show nothing until mounted (prevents hydration flash on mobile)
+  if (!mounted) return null;
+
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-3xl mx-auto px-6 py-12">
+    <motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-3xl mx-auto px-6 py-12">
       {/* ⏱️ 10-Minute Live Hotspot Session Banner */}
       <div className="mb-8 p-4 glass-card border border-white/60 bg-gradient-to-r from-emerald-500/10 via-amber-500/10 to-transparent rounded-2xl flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">

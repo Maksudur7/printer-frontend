@@ -45,8 +45,21 @@ function TrackContent() {
   const handlePrintAnother = () => {
     const targetKiosk = order?.kioskId || kioskId;
     reset();
+    let sessionParam = '';
+    try {
+      if (typeof window !== 'undefined' && targetKiosk) {
+        const raw = localStorage.getItem(`sp_active_session_${targetKiosk}`);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.token) {
+            sessionParam = `&session=${parsed.token}`;
+          }
+        }
+      }
+    } catch (_) {}
+
     if (targetKiosk) {
-      router.replace(`/upload?kiosk=${targetKiosk}`);
+      router.replace(`/upload?kiosk=${targetKiosk}${sessionParam}`);
     } else {
       router.replace('/');
     }

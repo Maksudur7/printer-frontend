@@ -45,7 +45,9 @@ function UploadContent() {
   const [bwRate, setBwRate] = useState(DEFAULT_BW_RATE);
   const [colorRate, setColorRate] = useState(DEFAULT_COLOR_RATE);
 
-  // Persistent 5-Minute Session Countdown Timer (Survives Refresh & Supports New QR Scans)
+  // Strict 5-Minute Session Countdown Timer
+  // Rule: exactly 1 session of 5 minutes. Cannot be reset by refresh or 'Print Another'.
+  // Only resets when the 5 minutes are fully expired AND customer scans a brand new QR code.
   const sessionToken = searchParams.get('session') || '';
   const initialDuration = parseInt(searchParams.get('time') || '300', 10);
   const [timeLeft, setTimeLeft] = useState<number>(initialDuration);
@@ -53,35 +55,59 @@ function UploadContent() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (!deviceId) return;
 
-    // Use sessionToken if available so every new QR scan gets its own fresh session timer
-    const storageKey = sessionToken
-      ? `sp_sess_exp_${sessionToken}`
-      : `sp_sess_exp_${deviceId || 'default'}`;
-
+    const storageKey = `sp_active_session_${deviceId}`;
     const now = Date.now();
-    let expiryTimestamp: number;
+    let currentSession: { token: string; expiry: number } | null = null;
 
-    const saved = localStorage.getItem(storageKey);
-    if (saved) {
-      const parsed = parseInt(saved, 10);
-      if (!isNaN(parsed) && parsed > now) {
-        // Active session running: preserve remaining time across browser refresh
-        expiryTimestamp = parsed;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) currentSession = JSON.parse(raw);
+    } catch (_) {
+      currentSession = null;
+    }
+
+    const hasActiveSession =
+      currentSession &&
+      typeof currentSession.expiry === 'number' &&
+      currentSession.expiry > now;
+
+    if (hasActiveSession) {
+      // If a brand new session token arrives from scanning QR AFTER an old session, restart:
+      if (sessionToken && currentSession && sessionToken !== currentSession.token) {
+        const newExpiry = now + initialDuration * 1000;
+        currentSession = { token: sessionToken, expiry: newExpiry };
+        localStorage.setItem(storageKey, JSON.stringify(currentSession));
+        setIsExpired(false);
       } else {
-        // Stored expiry is in the past -> Session expired
+        // Continuing current 5-minute session (Browser Refresh OR 'Print Another Document'):
+        // Keep the existing expiry timestamp! DO NOT RESET TIMER!
+      }
+    } else {
+      // No active session in progress
+      if (sessionToken) {
+        // Brand new session from QR scan:
+        const newExpiry = now + initialDuration * 1000;
+        currentSession = { token: sessionToken, expiry: newExpiry };
+        localStorage.setItem(storageKey, JSON.stringify(currentSession));
+        setIsExpired(false);
+      } else {
+        // Session expired and no new QR scan:
         setTimeLeft(0);
         setIsExpired(true);
         return;
       }
-    } else {
-      // 🌟 Brand new session from fresh QR scan
-      expiryTimestamp = now + initialDuration * 1000;
-      localStorage.setItem(storageKey, String(expiryTimestamp));
-      setIsExpired(false);
     }
 
-    const calcRemaining = () => Math.max(0, Math.floor((expiryTimestamp - Date.now()) / 1000));
+    if (!currentSession) {
+      setTimeLeft(0);
+      setIsExpired(true);
+      return;
+    }
+
+    const targetExpiry = currentSession.expiry;
+    const calcRemaining = () => Math.max(0, Math.floor((targetExpiry - Date.now()) / 1000));
     const initialRem = calcRemaining();
     setTimeLeft(initialRem);
     if (initialRem <= 0) {

@@ -4,7 +4,7 @@ import { Suspense, useCallback, useState, useRef, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   UploadCloud, FileText, X, Plus, Minus, Loader2, ArrowRight, Printer,
-  Layers, RotateCcw, AlertCircle, QrCode, Mail, Phone, Palette, Layout
+  Layers, RotateCcw, AlertCircle, QrCode, Palette, Layout
 } from 'lucide-react';
 import { PDFDocument } from 'pdf-lib';
 import { apiClient } from '@/lib/apiClient';
@@ -33,8 +33,6 @@ function UploadContent() {
   const [isColor, setIsColor] = useState(false);
   const [isDuplex, setIsDuplex] = useState(false);
   const [orientation, setOrientation] = useState<'PORTRAIT' | 'LANDSCAPE'>('PORTRAIT');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [dragging, setDragging] = useState(false);
   const [fileError, setFileError] = useState('');
   const [isParsing, setIsParsing] = useState(false);
@@ -88,7 +86,6 @@ function UploadContent() {
   const handleSubmit = async () => {
     if (!file) { setFileError('Please select a file to upload.'); return; }
     if (pageCount === 0) { setFileError('Wait for page count detection.'); return; }
-    if (!email || !phone) { setUploadError('Email and phone are required.'); return; }
     setUploading(true); setUploadError('');
     try {
       const fd = new FormData();
@@ -98,8 +95,6 @@ function UploadContent() {
       fd.append('isColor', String(isColor));
       fd.append('isDuplex', String(isDuplex));
       fd.append('orientation', orientation);
-      fd.append('userEmail', email);
-      fd.append('userPhone', phone);
       const res = await apiClient.post('/v1/order/upload', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -108,7 +103,6 @@ function UploadContent() {
       store.setFileInfo(file.name, pageCount);
       store.setSettings(copyCount, isColor);
       store.setTotalAmount(total);
-      store.setUserContact(email, phone);
       router.push(`/checkout?orderId=${order.id}`);
     } catch (err: unknown) {
       setUploadError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
@@ -242,23 +236,7 @@ function UploadContent() {
           </div>
         </div>
 
-        {/* User Info */}
-        <div className="glass-card p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-1">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" size={18} />
-              <input type="email" placeholder="e.g. john@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="input-field !pl-12" />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-1">Phone Number</label>
-            <div className="relative">
-              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" size={18} />
-              <input type="tel" placeholder="e.g. 01700000000" value={phone} onChange={(e) => setPhone(e.target.value)} className="input-field !pl-12" />
-            </div>
-          </div>
-        </div>
+
 
         {/* Action Bar */}
         <div className="glass-card p-8 bg-gradient-to-r from-white/60 to-white/20">

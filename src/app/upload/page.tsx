@@ -45,7 +45,8 @@ function UploadContent() {
   const [bwRate, setBwRate] = useState(DEFAULT_BW_RATE);
   const [colorRate, setColorRate] = useState(DEFAULT_COLOR_RATE);
 
-  // Persistent 5-Minute Session Countdown Timer (Survives Browser Refresh)
+  // Persistent 5-Minute Session Countdown Timer (Survives Refresh & Supports New QR Scans)
+  const sessionToken = searchParams.get('session') || '';
   const initialDuration = parseInt(searchParams.get('time') || '300', 10);
   const [timeLeft, setTimeLeft] = useState<number>(initialDuration);
   const [isExpired, setIsExpired] = useState(false);
@@ -53,23 +54,31 @@ function UploadContent() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const storageKey = `sp_session_expiry_${deviceId || 'default'}`;
+    // Use sessionToken if available so every new QR scan gets its own fresh session timer
+    const storageKey = sessionToken
+      ? `sp_sess_exp_${sessionToken}`
+      : `sp_sess_exp_${deviceId || 'default'}`;
+
     const now = Date.now();
     let expiryTimestamp: number;
 
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       const parsed = parseInt(saved, 10);
-      // If stored within the last 15 minutes, respect the real clock expiry
-      if (!isNaN(parsed) && parsed > now - 900 * 1000 && parsed < now + 900 * 1000) {
+      if (!isNaN(parsed) && parsed > now) {
+        // Active session running: preserve remaining time across browser refresh
         expiryTimestamp = parsed;
       } else {
-        expiryTimestamp = now + initialDuration * 1000;
-        localStorage.setItem(storageKey, String(expiryTimestamp));
+        // Stored expiry is in the past -> Session expired
+        setTimeLeft(0);
+        setIsExpired(true);
+        return;
       }
     } else {
+      // 🌟 Brand new session from fresh QR scan
       expiryTimestamp = now + initialDuration * 1000;
       localStorage.setItem(storageKey, String(expiryTimestamp));
+      setIsExpired(false);
     }
 
     const calcRemaining = () => Math.max(0, Math.floor((expiryTimestamp - Date.now()) / 1000));
@@ -90,7 +99,7 @@ function UploadContent() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [deviceId, initialDuration]);
+  }, [deviceId, sessionToken, initialDuration]);
 
   const formatTimer = (sec: number) => {
     const m = Math.floor(sec / 60);
